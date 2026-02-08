@@ -9,8 +9,6 @@ cmd_profile_start() {
     exit 1
   fi
 
-  verify_claude_cli
-
   local profile_dir
   profile_dir="$(get_profile_dir)/$profile_name"
 
