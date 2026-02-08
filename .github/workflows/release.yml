@@ -1,0 +1,98 @@
+name: Release
+
+on:
+  workflow_dispatch:
+  workflow_call:
+    outputs:
+      version:
+        description: "semantic version"
+        value: ${{ jobs.create-release.outputs.version }}
+      tag:
+        description: "semantic version tag"
+        value: ${{ jobs.create-release.outputs.tag }}
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.compute_version.outputs.semVer }}
+      tag: ${{ steps.create_tag.outputs.tag }}
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v4
+        with:
+          versionSpec: "6.3.x"
+          preferLatestVersion: true
+
+      - name: Compute Version
+        id: compute_version
+        uses: gittools/actions/gitversion/execute@v4
+        with:
+          useConfigFile: true
+          configFilePath: .github/.gitversion.yml
+
+      - run: echo "Computed SemVer:${{ steps.compute_version.outputs.semVer }}"
+
+      - name: Check Tag Exists
+        id: check_tag
+        run: |
+          tag="v${{ steps.compute_version.outputs.semVer }}"
+          if git rev-parse "$tag" >/dev/null 2>&1; then
+            echo "Tag $tag already exists — skipping."
+          else
+            echo "should_tag=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Configure Git
+        if: steps.check_tag.outputs.should_tag
+        run: |
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+
+      - name: Create Tag
+        if: steps.check_tag.outputs.should_tag
+        id: create_tag
+        run: |
+          tag="v${{ steps.compute_version.outputs.semVer }}"
+          git tag "$tag"
+          git push origin "$tag"
+          echo "tag=$tag" >> $GITHUB_OUTPUT
+
+      - name: Build Changelog
+        if: steps.check_tag.outputs.should_tag
+        id: changelog
+        run: |
+          CURRENT_TAG="${{ steps.create_tag.outputs.tag }}"
+          PREV_TAG=$(git tag --sort=-committerdate | grep -v "$CURRENT_TAG" | head -n 1)
+
+          if [ -z "$PREV_TAG" ]; then
+            PREV_TAG=$(git rev-list --max-parents=0 HEAD)
+          fi
+
+          CHANGELOG=$(git log --pretty="- %s (%h)" "$PREV_TAG".."$CURRENT_TAG")
+
+          echo "CHANGELOG<<EOF" >> $GITHUB_ENV
+          echo "$CHANGELOG" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Create Release
+        if: steps.check_tag.outputs.should_tag
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.create_tag.outputs.tag }}
+          name: "Release ${{ steps.create_tag.outputs.tag }}"
+          body: |
+            ## Release ${{ steps.create_tag.outputs.tag }}
+
+            ### Changes
+            ${{ env.CHANGELOG }}
+          draft: false
+          prerelease: false

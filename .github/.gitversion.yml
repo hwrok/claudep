@@ -1,0 +1,22 @@
+mode: ContinuousDeployment
+tag-prefix: v
+increment: None
+commit-message-incrementing: Enabled
+major-version-bump-message: '^(feat|fix|chore|ci|docs|test)(\(.+\))?\!:.*'
+minor-version-bump-message: '^feat(\(.+\))?:.*'
+patch-version-bump-message: '^(fix|ci)(\(.+\))?:.*'
+branches:
+  main:
+    is-main-branch: true
+    increment: None
+  feature:
+    label: alpha
+    regex: ^(feat(ure)?|(bug)?fix)[\/-](?<BranchName>.+)
+    increment: None
+  release:
+    label: rc
+    regex: ^releases?[\/-](?<BranchName>.+)
+    increment: None
+ignore:
+  sha: []
+merge-message-formats: {}
