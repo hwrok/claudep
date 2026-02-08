@@ -36,7 +36,6 @@ jobs:
         id: compute_version
         uses: gittools/actions/gitversion/execute@v4
         with:
-          useConfigFile: true
           configFilePath: .github/.gitversion.yml
 
       - run: echo "Computed SemVer:${{ steps.compute_version.outputs.semVer }}"
