@@ -26,11 +26,3 @@ get_default_template_dir() {
 get_profile_dir() {
   echo "$(get_base_path)/profiles"
 }
-
-verify_claude_cli() {
-  if ! command -v claude &>/dev/null; then
-    echo "Error: 'claude' command not found in PATH" >&2
-    echo "  Install Claude Code CLI or ensure it's in your PATH" >&2
-    exit 1
-  fi
-}

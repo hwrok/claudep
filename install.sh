@@ -25,6 +25,8 @@ make_executable() {
   chmod +x "$SCRIPT_DIR/claudep.sh"
   chmod +x "$SCRIPT_DIR/uninstall.sh"
   chmod +x "$SCRIPT_DIR"/lib/*.sh
+  chmod +x "$SCRIPT_DIR"/lib/profile/*.sh
+  chmod +x "$SCRIPT_DIR"/lib/template/*.sh
   echo "✓ Made scripts executable"
 }
 
