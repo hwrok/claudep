@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "companyAnnouncements": ["claudep development"],
+  "permissions": {
+    "allow": [
+      "Read(./.claude/**)",
+      "Read(./.github/**)",
+      "Read(./assets/**)",
+      "Read(./lib/**)",
+      "Read(./claudep.sh)",
+      "Read(./install.sh)",
+      "Read(./README.md)",
+      "Read(./uninstall.sh)"
+    ]
+  }
+}
