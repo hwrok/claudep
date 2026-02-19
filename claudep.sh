@@ -54,7 +54,7 @@ case "${1:-}" in
     echo "Usage: claudep {init|start|profile|template|uninstall}" >&2
     echo "" >&2
     echo "Commands:" >&2
-    echo "  init                  Initialize claudep" >&2
+    echo "  init                 Initialize claudep" >&2
     echo "  start <profile>      Launch claude with a profile" >&2
     echo "  profile <command>    Manage profiles (add|remove|list|start|eject)" >&2
     echo "  template <command>   Manage templates (add|remove|list)" >&2

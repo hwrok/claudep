@@ -20,7 +20,8 @@ _copy_settings() {
 _init_template() {
   local mode="$1" template_dir="$2" assets_template="$3"
 
-  local -a items=(agents rules skills statusline CLAUDE.md)
+  # TODO: kr -> keybindings:enter - https://github.com/anthropics/claude-code/issues/25087
+  local -a items=(agents rules skills statusline CLAUDE.md keybindings.json)
 
   for item in "${items[@]}"; do
     local src="$assets_template/$item"
