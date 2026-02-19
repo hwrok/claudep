@@ -24,6 +24,8 @@ cmd_profile_eject() {
     [skills]="skills"
     [statusline]="statusline"
     [instructions]="CLAUDE.md"
+    # TODO: kr -> keybindings:enter - https://github.com/anthropics/claude-code/issues/25087
+    [keybindings]="keybindings.json"
     [settings]="settings.json"
   )
 
