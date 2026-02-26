@@ -9,13 +9,22 @@
     "command": "<CLAUDEP_BASE_DIR>/statusline/statusline.sh",
     "padding": 0
   },
-  "effortLevel": "high",
-  "plansDirectory": "./.claude/plans",
   "env": {
+    "CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR": "1",
     "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
-    "CLAUDE_CODE_IDE_SKIP_AUTO_INSTALL": "1",
     "CLAUDE_CODE_DISABLE_TERMINAL_TITLE": "1",
     "CLAUDE_CODE_ENABLE_PROMPT_SUGGESTION": "false",
-    "COLORTERM": "truecolor"
-  }
+    "CLAUDE_CODE_IDE_SKIP_AUTO_INSTALL": "1",
+    "COLORTERM": "truecolor",
+    "DISABLE_ERROR_REPORTING": "1",
+    "DISABLE_TELEMETRY": "1"
+  },
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
+  "permissions": {
+    "defaultMode": "default"
+  },
+  "plansDirectory": "./.claude/plans",
 }
