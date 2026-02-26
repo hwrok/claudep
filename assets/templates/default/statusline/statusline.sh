@@ -39,6 +39,22 @@ input=$(cat)
 CONTEXT_SIZE=$(echo "$input" | jq -r '.context_window.context_window_size')
 USAGE=$(echo "$input" | jq '.context_window.current_usage')
 DIR=$(basename "$(echo "$input" | jq -r '.cwd // empty')")
+# resolve model display name; for bedrock ARN inference profiles, extract the trailing id
+resolve_model() {
+  local id display
+  id=$(echo "$input" | jq -r '.model.id // empty')
+  display=$(echo "$input" | jq -r '.model.display_name // empty')
+
+  if [[ "$id" == arn:aws:bedrock:* ]]; then
+    echo "${id##*/}"
+  elif [[ -n "$display" ]]; then
+    echo "$display"
+  else
+    echo "unknown"
+  fi
+}
+
+MODEL=$(resolve_model)
 PROFILE="${CLAUDEP_PROFILE:-unknown}"
 
 if [ "$USAGE" != "null" ]; then
@@ -46,7 +62,7 @@ if [ "$USAGE" != "null" ]; then
   PERCENT_USED=$((CURRENT_TOKENS * 100 / CONTEXT_SIZE))
   TOKENS_USED_K=$((CURRENT_TOKENS / 1000))
   TOKENS_TOTAL_K=$((CONTEXT_SIZE / 1000))
-  colorize --items "$DIR" "claudep:$PROFILE" "ctx: ${PERCENT_USED}% ${TOKENS_USED_K}/${TOKENS_TOTAL_K}k"
+  colorize --items "claudep:$PROFILE" "$MODEL" "ctx: ${TOKENS_USED_K}/${TOKENS_TOTAL_K}k" "$DIR"
 else
-  colorize --items "$DIR" "claudep:$PROFILE" "ctx: 0% 0/0k"
+  colorize --items "claudep:$PROFILE" "$MODEL" "ctx: 0/0k" "$DIR"
 fi
