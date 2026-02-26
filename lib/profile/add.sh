@@ -49,6 +49,8 @@ cmd_profile_add() {
   ln -s "$template_dir/skills" "$new_profile_dir/skills"
   ln -s "$template_dir/statusline" "$new_profile_dir/statusline"
   ln -s "$template_dir/CLAUDE.md" "$new_profile_dir/CLAUDE.md"
+  # TODO: kr -> keybindings:enter - https://github.com/anthropics/claude-code/issues/25087
+  ln -s "$template_dir/keybindings.json" "$new_profile_dir/keybindings.json"
   ln -s "$template_dir/settings.json" "$new_profile_dir/settings.json"
 
   echo "✓ Created profile: $profile_name (template: $template_name)"
