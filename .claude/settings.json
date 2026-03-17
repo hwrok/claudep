@@ -7,6 +7,7 @@
       "Read(./.github/**)",
       "Read(./assets/**)",
       "Read(./lib/**)",
+      "Read(.gitignore)",
       "Read(./claudep.sh)",
       "Read(./install.sh)",
       "Read(./README.md)",
