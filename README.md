@@ -215,6 +215,8 @@ You can eject individual items incrementally. No need to go all-or-nothing unles
 - **Do:** Edit ejected files directly in `~/.claudep/profiles/<name>/`. They're independent copies — no side effects.
 - **Don't:** Edit a profile's symlinked files. The symlink points back to the template, so you're actually editing the template — which silently affects every other profile using it. If you need a profile-specific change, `claudep profile eject` the item first.
 
+The default template ships a `rules/_claudep.md` rule file that gives Claude ambient awareness of the claudep environment - config directory layout, symlink behavior, and the eject workflow.
+
 ### Auth Configurations
 
 One of the more compelling reasons to use profiles: **per-profile AWS auth without polluting your global shell environment.**
