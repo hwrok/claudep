@@ -2,11 +2,11 @@
 
 **Profile manager for [Claude Code](https://docs.anthropic.com/en/docs/claude-code).**
 
-**[Why?](#why)** · **[Quick Start](#quick-start)** · **[How It Works](#how-it-works)** · **[Commands](#commands)** · **[Tips](#tips)** · **[Caveats](#known-caveats)**
+**[Why?](#why)** · **[Quick Start](#quick-start)** · **[How It Works](#how-it-works)** · **[Commands](#commands)** · **[Auth](#auth)** · **[Tips](#tips)** · **[Caveats](#known-caveats)**
 
 ## Why?
 
-Claude Code stores everything — auth, history, settings, rules — in a single `~/.claude` directory. Great if you're one person with one life. Less great if you:
+Claude Code stores everything - auth, history, settings, rules - in a single `~/.claude` directory. Great if you're one person with one life. Less great if you:
 
 - Switch between personal and work accounts
 - Use different [auth methods](https://code.claude.com/docs/en/setup#authentication) (OAuth vs AWS Bedrock vs API key)
@@ -14,21 +14,21 @@ Claude Code stores everything — auth, history, settings, rules — in a single
 - Need different rules/skills/agents per project category
 - Are just generally the kind of person who has opinions about config organization 🫠
 
-claudep leverages Claude Code's officially supported [`CLAUDE_CONFIG_DIR`](https://code.claude.com/docs/en/settings) env var to point at different config directories per profile. Profiles symlink to shared templates for common config, so you're not copy-pasting CLAUDE.md files around like an animal.
+claudep uses Claude Code's officially supported [`CLAUDE_CONFIG_DIR`](https://code.claude.com/docs/en/settings) env var to point at different config directories per profile. Profiles then symlink to shared templates for the common config, so you're not copy-pasting CLAUDE.md files around like an animal.
 
-**This is user-level profile swapping.** Claude Code's settings hierarchy (project `settings.local.json` → project `settings.json` → user config) is fully respected — claudep just swaps which user config directory Claude sees.
+**This is user-level profile swapping.** Claude Code's settings hierarchy (project `settings.local.json` → project `settings.json` → user config) is fully respected - claudep just swaps which user config directory Claude sees.
 
-Other typical `~/.claude` directories like `cache`, `debug`, `plugins`, `todos`, and `history` are auto-created by Claude Code per profile and stay fully isolated — no leakage between profiles. The only things shared are the dirs claudep explicitly manages via symlinks (settings, rules, agents, skills, statusline, CLAUDE.md). This does mean some light redundancy per profile as caches and plugins are downloaded independently. An acceptable tradeoff for now — a more pnpm-style content-addressable symlink approach may come later if it becomes painful. 📦
+Other typical `~/.claude` directories (`cache`, `debug`, `plugins`, `todos`, `history`, etc) are auto-created by Claude Code per profile and stay isolated, so no leakage between profiles. The only things shared are the dirs claudep explicitly manages via symlinks (settings, rules, agents, skills, statusline, CLAUDE.md). That does mean some light redundancy per profile since caches and plugins get downloaded independently - acceptable tradeoff for now, a more pnpm-style content-addressable symlink approach may come later if it ever becomes painful enough to care about. 📦
 
 ### How is this different?
 
-Claude Code has no built-in profile management — Anthropic's [official stance](https://github.com/anthropics/claude-code/issues/261) is that `CLAUDE_CONFIG_DIR` is the answer. Fair enough.
+Claude Code has no built-in profile management - Anthropic's [official stance](https://github.com/anthropics/claude-code/issues/261) is that `CLAUDE_CONFIG_DIR` is the answer, and fair enough.
 
-There are a handful of third-party account switchers ([ccs](https://github.com/kaitranntt/ccs), [cc-account-switcher](https://github.com/ming86/cc-account-switcher), [claude-switch](https://github.com/rzkmak/claude-switch), etc.) that swap auth credentials between accounts. They solve the "which account am I logged into" problem.
+There are a handful of third-party account switchers ([ccs](https://github.com/kaitranntt/ccs), [cc-account-switcher](https://github.com/ming86/cc-account-switcher), [claude-switch](https://github.com/rzkmak/claude-switch), etc) that swap auth credentials between accounts. They solve the "which account am I logged into" problem.
 
-claudep solves a different problem: **shared config management across profiles.** Rather than duplicating your rules, agents, skills, and instructions into every profile directory, claudep symlinks them from templates. Update a template, every linked profile gets the change. Need one profile to diverge? Eject just that item. The rest keeps inheriting. None of the existing tools do this — they're account switchers, not config managers.
+claudep solves a different (though related) problem: **shared config management across profiles.** Rather than duplicating rules, agents, skills, and instructions into every profile directory, claudep symlinks them from templates. Update a template, every linked profile gets the change. Need one profile to diverge? Eject just that item and the rest keeps inheriting. None of the existing tools do this - they're account switchers, not config managers.
 
-That said, claudep *is* also an account switcher — each profile has its own isolated auth state, so switching profiles switches accounts. It just gets there as a side effect of managing entire config directories rather than swapping credentials directly. 🤝
+That said, claudep *is* also an account switcher, ie each profile has its own isolated auth state, so switching profiles switches accounts. It just gets there as a side effect of managing entire config directories rather than swapping credentials directly. 🤝
 
 ## Quick Start
 
@@ -71,103 +71,58 @@ That's it. You now have a `personal` profile that symlinks to the default templa
 - **Profiles** are what Claude Code actually runs against (`CLAUDE_CONFIG_DIR` points here).
 - **Eject** breaks individual symlinks into independent copies when a profile needs to diverge.
 
-Think of it as template inheritance, minus the inheritance. One level of symlinks. No magic. ✨
+Template inheritance, minus the inheritance. One level of symlinks, no magic. ✨
 
 ## Commands
 
-### `claudep init`
+### Top-level
 
-Sets up claudep's directory structure and default template.
+| Command | Description |
+|---|---|
+| `claudep init [--path <dir>] [--force]` | Set up `~/.claudep` (or `--path`) with the default template. Re-running prompts to refresh/fill; `--force` skips the prompt. |
+| `claudep start <profile> [...]` | Launch Claude Code with the given profile. Extra args pass through to `claude` (e.g. `--resume`, `-p "..."`). Also aliased as `claudep profile start`. |
+| `claudep uninstall` | Remove the claudep symlink; optionally wipe all data. |
 
-```bash
-claudep init                   # defaults to ~/.claudep
-claudep init --path ~/my-dir   # custom location
-claudep init --force           # re-init, overwrite template (no prompt)
-```
+### Profiles
 
-Re-running `init` on an existing install prompts you to refresh or fill missing files.
+A profile is a distinct `CLAUDE_CONFIG_DIR` - isolated auth, history, and todos. Shared config (rules, agents, CLAUDE.md, etc.) is symlinked from a template until ejected.
 
-### `claudep start <profile> [...]`
-
-Launch Claude Code with the given profile. Any additional args are passed through to `claude`.
-
-```bash
-claudep start work
-claudep start work --resume
-claudep start work -p "fix the tests"
-```
-
-Also available as `claudep profile start <profile>` if you enjoy typing.
-
----
-
-### Profile Commands
-
-Profiles represent distinct Claude Code environments — different accounts, auth methods, or project contexts. Each profile is its own `CLAUDE_CONFIG_DIR` with isolated history, auth state, and todos. Shared config (rules, agents, etc.) is symlinked from a template until you eject it.
-
-#### `claudep profile add <name> [--template <name>]`
-
-Create a new profile. Symlinks to the default template unless `--template` is specified.
-
-```bash
-claudep profile add personal
-claudep profile add work --template corp
-```
-
-#### `claudep profile list`
-
-List available profiles.
-
-#### `claudep profile remove <name>`
-
-Delete a profile (with confirmation). Just removes the profile directory — templates are untouched.
-
-#### `claudep profile eject <name> --all | --items <list>`
-
-Convert symlinked items to independent copies. For when a profile needs its own version of something.
-
-```bash
-# eject everything
-claudep profile eject work --all
-
-# eject specific items
-claudep profile eject work --items settings,instructions
-```
+| Command | Description |
+|---|---|
+| `claudep profile add <name> [--template <src>]` | Create a profile symlinked to `<src>` (defaults to `default`). |
+| `claudep profile list` | List profiles. |
+| `claudep profile remove <name>` | Delete a profile (confirmation required). Templates untouched. |
+| `claudep profile eject <name> --all \| --items <list>` | Convert symlinked items into independent copies. |
 
 **Ejectable items:** `agents`, `rules`, `skills`, `statusline`, `instructions` (CLAUDE.md), `settings` (settings.json)
 
-Eject resolves from wherever the symlink currently points — not hardcoded to default. So profiles extending custom templates eject correctly. 👍
-
----
-
-### Template Commands
-
-Templates are optional if you only need one shared config — `default` is created by `init` and most users never need another. They become useful when you want different base configurations for *categories* of work: a `dev` template with coding-focused agents and strict rules, a `research` template with exploratory skills, a `corp` template with your org's blessed settings. Profiles extend a template, so updating the template propagates to all linked profiles.
-
-#### `claudep template add <name> [--template <source>]`
-
-Create a new template by copying from an existing one (defaults to `default`).
-
 ```bash
-claudep template add corp
-claudep template add research --template dev
+claudep profile add work --template corp
+claudep profile eject work --items settings,instructions
 ```
 
-After creation, edit the template's files directly in `~/.claudep/templates/<name>/`.
+Eject resolves from wherever the symlink currently points - not hardcoded to `default`. Profiles extending custom templates eject correctly. 👍
 
-#### `claudep template list`
+### Templates
 
-List available templates.
+Templates are optional - `default` covers most cases. Useful when you want distinct *categories* of base config: a `dev` template with coding agents, a `research` template with exploratory skills, a `corp` template with org-blessed settings. Updating a template propagates to every profile linked to it.
 
-#### `claudep template remove <name>`
+| Command | Description |
+|---|---|
+| `claudep template add <name> [--template <src>]` | Create a template by copying from `<src>` (defaults to `default`). Edit files directly in `~/.claudep/templates/<name>/`. |
+| `claudep template list` | List templates. |
+| `claudep template remove <name>` | Delete a template. Refuses to remove `default` (it's not a democracy 🗳️) or any template still linked by a profile. |
 
-Delete a template. Refuses to remove `default` (it's not a democracy 🗳️). Also refuses if any profiles are still linked to it — eject or remove them first.
+## Auth
 
----
+For standard Claude auth there's no claudep-specific step - `claudep start <profile>` and log in as you normally would on first run. Credentials are cached inside the profile's config dir, so:
 
-### `claudep uninstall`
+- Each profile keeps its own independent login
+- Auth persists across `/exit` and future `claudep start` runs
+- You can use multiple profiles simultaneously in different terminal sessions (e.g. `claudep start work` in one tab, `claudep start personal` in another) without logging in and out
+- Switching accounts = switching profiles
 
-Removes the claudep symlink and optionally cleans up all data.
+For Bedrock, API key, or other non-OAuth setups, eject the profile's `settings` and configure env vars there - see [Auth Configurations](#auth-configurations) below.
 
 ## Installation
 
@@ -183,7 +138,7 @@ chmod +x ./install.sh
 ./install.sh /path/to/bin/claudep
 ```
 
-The installer creates a symlink — the actual scripts stay wherever you cloned them.
+The installer creates a symlink - the actual scripts stay wherever you cloned them.
 
 ## Statusline
 
@@ -193,15 +148,15 @@ claudep includes a statusline script that displays the active profile and contex
 [claudep:personal | ctx: 84/200k | <current-dir>]
 ```
 
-This is configured automatically via the template's `settings.json`. Uses `jq` to parse the context metrics Claude Code pipes to stdin. If you don't have `jq`, the statusline just won't work — everything else is fine.
+This is configured automatically via the template's `settings.json`. Uses `jq` to parse the context metrics Claude Code pipes to stdin. If you don't have `jq`, the statusline just won't work - everything else is fine.
 
 ## Eject Workflow
 
 The typical lifecycle:
 
-1. `claudep profile add work` — fresh profile, fully symlinked to template
+1. `claudep profile add work` - fresh profile, fully symlinked to template
 2. Use it for a while, realize you need different settings for this profile
-3. `claudep profile eject work --items settings` — settings.json is now an independent copy
+3. `claudep profile eject work --items settings` - settings.json is now an independent copy
 4. Edit `~/.claudep/profiles/work/settings.json` directly
 5. Everything else still inherits from the template
 
@@ -212,8 +167,8 @@ You can eject individual items incrementally. No need to go all-or-nothing unles
 ### Customization
 
 - **Do:** Edit template files directly in `~/.claudep/templates/<name>/`. Changes propagate to all profiles linked to that template.
-- **Do:** Edit ejected files directly in `~/.claudep/profiles/<name>/`. They're independent copies — no side effects.
-- **Don't:** Edit a profile's symlinked files. The symlink points back to the template, so you're actually editing the template — which silently affects every other profile using it. If you need a profile-specific change, `claudep profile eject` the item first.
+- **Do:** Edit ejected files directly in `~/.claudep/profiles/<name>/`. They're independent copies - no side effects.
+- **Don't:** Edit a profile's symlinked files. The symlink points back to the template, so you're actually editing the template - which silently affects every other profile using it. If you need a profile-specific change, `claudep profile eject` the item first.
 
 The default template ships a `rules/_claudep.md` rule file that gives Claude ambient awareness of the claudep environment - config directory layout, symlink behavior, and the eject workflow.
 
@@ -221,7 +176,7 @@ The default template ships a `rules/_claudep.md` rule file that gives Claude amb
 
 One of the more compelling reasons to use profiles: **per-profile AWS auth without polluting your global shell environment.**
 
-The [Claude Code docs](https://code.claude.com/docs/en/amazon-bedrock#claude-code-on-amazon-bedrock) suggest exporting `AWS_PROFILE` and friends in your `.zshrc`. This works right up until you accidentally run a Bedrock request against your personal account because you forgot which profile was exported globally. 🙃
+The [Claude Code docs](https://code.claude.com/docs/en/amazon-bedrock#claude-code-on-amazon-bedrock) suggest exporting `AWS_PROFILE` and friends in your `.zshrc`, which works right up until you accidentally run a Bedrock request against the wrong account because you forgot which profile was exported globally. 🙃
 
 With claudep, each profile's `settings.json` scopes the env vars to that Claude session:
 
@@ -247,12 +202,12 @@ With claudep, each profile's `settings.json` scopes the env vars to that Claude 
 1. `claudep profile add work-bedrock`
 2. `claudep profile eject work-bedrock --items settings`
 3. Edit the ejected `settings.json` with your Bedrock/SSO config
-4. `claudep start work-bedrock` — AWS auth is scoped to this session only
+4. `claudep start work-bedrock` - AWS auth is scoped to this session only
 
-Your personal profile keeps using OAuth (or whatever), your work profile uses Bedrock via SSO, and neither knows the other exists. No global env vars. No accidents. No "why is this billing to the wrong account" Slack messages at 2am. 🫡
+Personal profile keeps using OAuth (or whatever), work profile uses Bedrock via SSO, neither knows the other exists. No global env vars, no accidents, no "why is this billing to the wrong account" Slack messages at 2am. 🫡
 
 ## Known Caveats
 
-- **JetBrains plugin / `/ide` command:** There's a [known Claude Code issue](https://github.com/anthropics/claude-code/issues/4739) where the `/ide` command and JetBrains plugin use hardcoded paths for lock files, which breaks when `CLAUDE_CONFIG_DIR` is set. This is a Claude Code bug, not a claudep bug. **Workaround:** use Claude Code from the IDE's built-in terminal (`claudep start <profile>`) rather than through the plugin. Works fine — you just don't get the plugin's UI integration.
+- **JetBrains plugin / `/ide` command:** There's a [known Claude Code issue](https://github.com/anthropics/claude-code/issues/4739) where the `/ide` command and JetBrains plugin use hardcoded paths for lock files, which breaks when `CLAUDE_CONFIG_DIR` is set. This is a Claude Code bug, not a claudep bug. **Workaround:** use Claude Code from the IDE's built-in terminal (`claudep start <profile>`) rather than through the plugin. Works fine - you just don't get the plugin's UI integration.
 - **Empty template directories:** Git doesn't track empty directories, so some directories (`agents/`, `rules/`, etc) in the default template use `.gitkeep` files to persist in the repo. These are automatically removed during initialization.
-- **`keybindings.json` enter key:** There's a [known Claude Code bug](https://github.com/anthropics/claude-code/issues/25087) where `keybindings.json` is ignored for the `enter` key — setting `"enter": null` to unbind submit has no effect. Not a `claudep` issue.
+- **`keybindings.json` enter key:** There's a [known Claude Code bug](https://github.com/anthropics/claude-code/issues/25087) where `keybindings.json` is ignored for the `enter` key - setting `"enter": null` to unbind submit has no effect. Not a `claudep` issue.
