@@ -39,6 +39,10 @@ input=$(cat)
 CONTEXT_SIZE=$(echo "$input" | jq -r '.context_window.context_window_size')
 USAGE=$(echo "$input" | jq '.context_window.current_usage')
 DIR=$(basename "$(echo "$input" | jq -r '.cwd // empty')")
+WORKTREE=$(echo "$input" | jq -r '.workspace.git_worktree // empty')
+if [ -n "$WORKTREE" ]; then
+  DIR="$DIR ($WORKTREE)"
+fi
 # resolve model display name; for bedrock ARN inference profiles, extract the trailing id
 resolve_model() {
   local id display
