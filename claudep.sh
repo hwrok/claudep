@@ -27,8 +27,9 @@ case "${1:-}" in
       list)   source "$LIB_DIR/profile/list.sh";   shift; cmd_profile_list "$@" ;;
       start)  source "$LIB_DIR/profile/start.sh";  shift; cmd_profile_start "$@" ;;
       eject)  source "$LIB_DIR/profile/eject.sh";  shift; cmd_profile_eject "$@" ;;
+      relink) source "$LIB_DIR/profile/relink.sh"; shift; cmd_profile_relink "$@" ;;
       *)
-        echo "Usage: claudep profile {add|remove|list|start|eject} [args]" >&2
+        echo "Usage: claudep profile {add|remove|list|start|eject|relink} [args]" >&2
         exit 1
         ;;
     esac
@@ -40,8 +41,9 @@ case "${1:-}" in
       add)    source "$LIB_DIR/template/add.sh";    shift; cmd_template_add "$@" ;;
       remove) source "$LIB_DIR/template/remove.sh"; shift; cmd_template_remove "$@" ;;
       list)   source "$LIB_DIR/template/list.sh";   shift; cmd_template_list "$@" ;;
+      fill)   source "$LIB_DIR/template/fill.sh";   shift; cmd_template_fill "$@" ;;
       *)
-        echo "Usage: claudep template {add|remove|list} [args]" >&2
+        echo "Usage: claudep template {add|remove|list|fill} [args]" >&2
         exit 1
         ;;
     esac
@@ -56,8 +58,8 @@ case "${1:-}" in
     echo "Commands:" >&2
     echo "  init                 Initialize claudep" >&2
     echo "  start <profile>      Launch claude with a profile" >&2
-    echo "  profile <command>    Manage profiles (add|remove|list|start|eject)" >&2
-    echo "  template <command>   Manage templates (add|remove|list)" >&2
+    echo "  profile <command>    Manage profiles (add|remove|list|start|eject|relink)" >&2
+    echo "  template <command>   Manage templates (add|remove|list|fill)" >&2
     echo "  uninstall            Remove claudep" >&2
     exit 1
     ;;

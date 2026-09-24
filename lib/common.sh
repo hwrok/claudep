@@ -7,6 +7,30 @@ CLAUDEP_BASE_DIR_NAME=".claudep"
 
 DEFAULT_TEMPLATE="templates/default"
 
+# canonical list of items a profile shares from its template
+# format: <eject-key>:<path relative to template/profile root>
+# TODO: kr -> keybindings:enter - https://github.com/anthropics/claude-code/issues/25087
+CLAUDEP_SHARED_ITEMS=(
+  "agents:agents"
+  "rules:rules"
+  "skills:skills"
+  "commands:commands"
+  "workflows:workflows"
+  "output-styles:output-styles"
+  "statusline:statusline"
+  "instructions:CLAUDE.md"
+  "keybindings:keybindings.json"
+  "settings:settings.json"
+)
+
+# paths only, in declaration order
+shared_item_paths() {
+  local entry
+  for entry in "${CLAUDEP_SHARED_ITEMS[@]}"; do
+    echo "${entry##*:}"
+  done
+}
+
 get_base_path() {
   if [[ ! -f "$CONFIG_PATH_FILE" ]]; then
     echo "Error: claudep not initialized. Run: claudep init" >&2

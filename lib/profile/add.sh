@@ -44,14 +44,10 @@ cmd_profile_add() {
   mkdir -p "$new_profile_dir"
 
   # symlink shared resources from template
-  ln -s "$template_dir/agents" "$new_profile_dir/agents"
-  ln -s "$template_dir/rules" "$new_profile_dir/rules"
-  ln -s "$template_dir/skills" "$new_profile_dir/skills"
-  ln -s "$template_dir/statusline" "$new_profile_dir/statusline"
-  ln -s "$template_dir/CLAUDE.md" "$new_profile_dir/CLAUDE.md"
-  # TODO: kr -> keybindings:enter - https://github.com/anthropics/claude-code/issues/25087
-  ln -s "$template_dir/keybindings.json" "$new_profile_dir/keybindings.json"
-  ln -s "$template_dir/settings.json" "$new_profile_dir/settings.json"
+  local item
+  for item in $(shared_item_paths); do
+    ln -s "$template_dir/$item" "$new_profile_dir/$item"
+  done
 
   echo "✓ Created profile: $profile_name (template: $template_name)"
   echo "  Location: $new_profile_dir"

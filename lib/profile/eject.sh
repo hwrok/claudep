@@ -18,16 +18,11 @@ cmd_profile_eject() {
     exit 1
   fi
 
-  local -A eject_map=(
-    [agents]="agents"
-    [rules]="rules"
-    [skills]="skills"
-    [statusline]="statusline"
-    [instructions]="CLAUDE.md"
-    # TODO: kr -> keybindings:enter - https://github.com/anthropics/claude-code/issues/25087
-    [keybindings]="keybindings.json"
-    [settings]="settings.json"
-  )
+  local -A eject_map=()
+  local entry
+  for entry in "${CLAUDEP_SHARED_ITEMS[@]}"; do
+    eject_map[${entry%%:*}]="${entry##*:}"
+  done
 
   local -a items_to_eject=()
 
@@ -47,7 +42,7 @@ cmd_profile_eject() {
   fi
 
   for item_key in "${items_to_eject[@]}"; do
-    local item_path="${eject_map[$item_key]}"
+    local item_path="${eject_map[$item_key]:-}"
 
     if [[ -z "$item_path" ]]; then
       echo "⚠️  Unknown item: $item_key (skipping)" >&2
@@ -62,16 +57,14 @@ cmd_profile_eject() {
     fi
 
     # resolve symlink source before removing
-    local source
-    source=$(readlink "$target")
+    local link_target="$(readlink "$target")"
 
     rm "$target"
-    cp -r "$source" "$target"
+    cp -r "$link_target" "$target"
 
     # handle settings.json -> update statusline path from whatever template it came from
     if [[ "$item_path" == "settings.json" ]]; then
-      local source_dir
-      source_dir=$(dirname "$source")
+      local source_dir="$(dirname "$link_target")"
       sed -i.bak "s|$source_dir/statusline|$profile_dir/statusline|g" "$target"
       rm "$target.bak"
     fi

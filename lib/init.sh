@@ -20,8 +20,9 @@ _copy_settings() {
 _init_template() {
   local mode="$1" template_dir="$2" assets_template="$3"
 
-  # TODO: kr -> keybindings:enter - https://github.com/anthropics/claude-code/issues/25087
-  local -a items=(agents rules skills statusline CLAUDE.md keybindings.json)
+  # settings.json is handled separately below (template substitution)
+  local -a items=("${(@f)$(shared_item_paths)}")
+  items=("${(@)items:#settings.json}")
 
   for item in "${items[@]}"; do
     local src="$assets_template/$item"
