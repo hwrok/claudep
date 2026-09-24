@@ -19,6 +19,7 @@
     "defaultMode": "default"
   },
   "plansDirectory": "./.claude/plans",
+  "syncClaudeAiSkills": false,
   "statusLine": {
     "command": "<CLAUDEP_BASE_DIR>/statusline/statusline.sh",
     "padding": 0,

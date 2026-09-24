@@ -34,8 +34,7 @@ cmd_template_remove() {
   for p in "$profile_dir"/*(N); do
     [[ ! -d "$p" ]] && continue
     for item in "$p"/*(-@N) "$p"/*(N@); do
-      local link_target
-      link_target=$(readlink "$item" 2>/dev/null || true)
+      local link_target="$(readlink "$item" 2>/dev/null || true)"
       if [[ "$link_target" == "$template_dir"* ]]; then
         linked_profiles+=("$(basename "$p")")
         break
