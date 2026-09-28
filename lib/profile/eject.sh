@@ -62,13 +62,6 @@ cmd_profile_eject() {
     rm "$target"
     cp -r "$link_target" "$target"
 
-    # handle settings.json -> update statusline path from whatever template it came from
-    if [[ "$item_path" == "settings.json" ]]; then
-      local source_dir="$(dirname "$link_target")"
-      sed -i.bak "s|$source_dir/statusline|$profile_dir/statusline|g" "$target"
-      rm "$target.bak"
-    fi
-
     # restore executable bit if needed
     if [[ "$item_path" == "statusline" ]]; then
       chmod +x "$target/statusline.sh"

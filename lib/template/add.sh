@@ -42,12 +42,6 @@ cmd_template_add() {
 
   cp -r "$source_dir" "$dest_dir"
 
-  # update settings.json to reference new template's own path
-  if [[ -f "$dest_dir/settings.json" ]]; then
-    sed -i.bak "s|$source_dir|$dest_dir|g" "$dest_dir/settings.json"
-    rm "$dest_dir/settings.json.bak"
-  fi
-
   # ensure statusline is executable
   [[ -f "$dest_dir/statusline/statusline.sh" ]] && \
     chmod +x "$dest_dir/statusline/statusline.sh"
