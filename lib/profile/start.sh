@@ -9,6 +9,8 @@ cmd_profile_start() {
     exit 1
   fi
 
+  validate_name profile "$profile_name"
+
   local profile_dir
   profile_dir="$(get_profile_dir)/$profile_name"
 

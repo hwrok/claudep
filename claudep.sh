@@ -52,8 +52,12 @@ case "${1:-}" in
   uninstall)
     exec "$SCRIPT_DIR/uninstall.sh" "$@" ;;
 
+  -v|--version)
+    # version comes from the clone's own tags - nothing to bump by hand
+    echo "claudep $(git -C "$SCRIPT_DIR" describe --tags --always --dirty 2>/dev/null || echo unknown)" ;;
+
   *)
-    echo "Usage: claudep {init|start|profile|template|uninstall}" >&2
+    echo "Usage: claudep {init|start|profile|template|uninstall|--version}" >&2
     echo "" >&2
     echo "Commands:" >&2
     echo "  init                 Initialize claudep" >&2
@@ -61,6 +65,7 @@ case "${1:-}" in
     echo "  profile <command>    Manage profiles (add|remove|list|start|eject|relink)" >&2
     echo "  template <command>   Manage templates (add|remove|list|fill)" >&2
     echo "  uninstall            Remove claudep" >&2
+    echo "  --version            Print the claudep version" >&2
     exit 1
     ;;
 esac

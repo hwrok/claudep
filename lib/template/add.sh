@@ -10,10 +10,7 @@ cmd_template_add() {
   fi
   shift
 
-  if [[ "$template_name" =~ [/\\] ]] || [[ "$template_name" == .* ]]; then
-    echo "Error: Invalid template name: $template_name" >&2
-    exit 1
-  fi
+  validate_name template "$template_name"
 
   local source_name="default"
 
@@ -23,6 +20,8 @@ cmd_template_add() {
       *) echo "Unknown flag: $1" >&2; exit 1 ;;
     esac
   done
+
+  validate_name template "$source_name"
 
   local templates_dir
   templates_dir=$(get_templates_dir)

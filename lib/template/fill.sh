@@ -16,7 +16,7 @@ cmd_template_fill() {
       echo "Usage: claudep template fill <name> | --all" >&2
       exit 1
       ;;
-    *) targets=("$1"); shift ;;
+    *) validate_name template "$1"; targets=("$1"); shift ;;
   esac
 
   if [[ $# -gt 0 ]]; then

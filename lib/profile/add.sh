@@ -10,12 +10,7 @@ cmd_profile_add() {
   fi
   shift
 
-  # validate folder name (no slashes, no leading dots)
-  if [[ "$profile_name" =~ [/\\] ]] || [[ "$profile_name" == .* ]]; then
-    echo "Error: Invalid profile name: $profile_name" >&2
-    echo "  Must be valid folder name, no slashes, no leading dots" >&2
-    exit 1
-  fi
+  validate_name profile "$profile_name"
 
   local template_name="default"
 
@@ -25,6 +20,8 @@ cmd_profile_add() {
       *) echo "Unknown flag: $1" >&2; exit 1 ;;
     esac
   done
+
+  validate_name template "$template_name"
 
   local template_dir="$(get_templates_dir)/$template_name"
 
