@@ -4,8 +4,9 @@
 
 **[Why?](#why)** · **[Quick Start](#quick-start)** · **[How It Works](#how-it-works)** · **[Commands](#commands)** · **[Auth](#auth)** · **[Upgrading](#upgrading)** · **[Tips](#tips)** · **[Caveats](#known-caveats)**
 
-- **Last verified against:** Claude Code `2.1.280`
+- **Last verified against:** Claude Code `2.1.283`
 - **Recommended minimum:** Claude Code `2.1.247` - earlier builds had sandbox bugs that could refuse or delete symlinked config
+- **Noticed Claude Code behaving differently recently?** Check its [release notes](https://github.com/anthropics/claude-code/releases) first - upstream changes defaults fairly often
 
 claudep is maintained even if there are not recent commits. It does one small job against a `CLAUDE_CONFIG_DIR` contract that rarely changes, so a long gap between "releases" usually means there's nothing to fix.
 
@@ -164,28 +165,13 @@ The installer creates a symlink - the actual scripts stay wherever you cloned th
 
 ## Upgrading
 
-When claudep adds a new config directory to accomadate Claude Code updates, existing installs have to pick it up in two places: the templates, then each profile.
+Upgrade steps and anything you need to do by hand are in the [release notes](https://github.com/hwrok/claudep/releases) - this README only describes the current version.
 
-```bash
-# git pull if you cloned the claudep repo, otherwise grab the latest release
-git pull && ./install.sh
+Easiest way through: start a Claude session in your claudep clone (via claudep or not, doesn't matter) and give it this:
 
-# add new shared items to every template
-claudep template fill --all
+> Compare the commit I'm on to the latest release at https://github.com/hwrok/claudep/releases, pull, then walk me through any manual steps from the release notes in between.
 
-# backfill the symlinks into each existing profile
-claudep profile relink <profile>
-```
-
-Both only add what's missing - `fill` never touches an existing file, `relink` leaves ejected items and links to other templates alone. Safe to re-run, and a no-op if you're current.
-
-Order matters: `fill` first. `relink` can only link an item the template has, and will tell you which ones it skipped if run early.
-
-Neither command rewrites an existing `settings.json`, so new default settings never reach an existing template or profile. Add these by hand:
-
-- `"syncClaudeAiSkills": false` - see [Known Caveats](#known-caveats) for why claudep prefers it disabled
-
-> ⚠️ `claudep init --force` is not an upgrade path. That's refresh mode and it overwrites the default template, customizations included.
+> ⚠️ `claudep init --force` is not an upgrade path - it overwrites the default template, customizations included.
 
 ## Statusline
 

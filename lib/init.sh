@@ -12,17 +12,10 @@ _copy_item() {
   fi
 }
 
-_copy_settings() {
-  local src="$1" dst="$2" template_dir="$3"
-  sed "s|<CLAUDEP_BASE_DIR>|$template_dir|g" "$src" > "$dst"
-}
-
 _init_template() {
   local mode="$1" template_dir="$2" assets_template="$3"
 
-  # settings.json is handled separately below (template substitution)
   local -a items=("${(@f)$(shared_item_paths)}")
-  items=("${(@)items:#settings.json}")
 
   for item in "${items[@]}"; do
     local src="$assets_template/$item"
@@ -38,12 +31,6 @@ _init_template() {
   # statusline needs +x
   [[ -f "$template_dir/statusline/statusline.sh" ]] && \
     chmod +x "$template_dir/statusline/statusline.sh"
-
-  # settings.json handled separately (template substitution)
-  local settings_dst="$template_dir/settings.json"
-  if [[ "$mode" == "refresh" || "$mode" == "init" ]] || [[ ! -e "$settings_dst" ]]; then
-    _copy_settings "$assets_template/settings.json" "$settings_dst" "$template_dir"
-  fi
 }
 
 cmd_init() {
