@@ -9,6 +9,8 @@ cmd_template_remove() {
     exit 1
   fi
 
+  validate_name template "$template_name"
+
   if [[ "$template_name" == "default" ]]; then
     echo "Error: Cannot remove the default template" >&2
     exit 1

@@ -91,6 +91,7 @@ Template inheritance, minus the inheritance. One level of symlinks, no magic. âœ
 | `claudep init [--path <dir>] [--force]` | Set up `~/.claudep` (or `--path`) with the default template. Re-running prompts to refresh/fill; `--force` skips the prompt.                           |
 | `claudep start <profile> [...]`         | Launch Claude Code with the given profile. Extra args pass through to `claude` (e.g. `--resume`, `-p "..."`). Also aliased as `claudep profile start`. |
 | `claudep uninstall`                     | Remove the claudep symlink; optionally wipe all data.                                                                                                  |
+| `claudep --version`                     | Print the installed version, read from the clone's git tags.                                                                                           |
 
 ### Profiles
 
@@ -175,10 +176,10 @@ Easiest way through: start a Claude session in your claudep clone (via claudep o
 
 ## Statusline
 
-claudep includes a statusline script that displays the active profile and context window usage in Claude Code's status bar.
+claudep includes a statusline script that displays the active profile, model, and context window usage in Claude Code's status bar.
 
 ```
-[claudep:personal | ctx: 84/200k | <current-dir>]
+[claudep:personal | Opus 5.5 | ctx: 84/1000k | <current-dir>]
 ```
 
 This is configured automatically via the template's `settings.json`. Uses `jq` to parse the context metrics Claude Code pipes to stdin. If you don't have `jq`, the statusline just won't work - everything else is fine.

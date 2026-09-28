@@ -39,7 +39,8 @@ if [[ -f "$PROFILES_DIR_FILE" ]]; then
 elif [[ -d "$CONFIG_DIR" ]]; then
   echo ""
   echo "Found config dir: $CONFIG_DIR"
-  read -p "Remove config? (y/N): " -n 1 -r
+  echo -n "Remove config? (y/N): "
+  read -r REPLY
   echo
   
   if [[ $REPLY =~ ^[Yy]$ ]]; then

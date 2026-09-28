@@ -38,6 +38,11 @@ cmd_profile_relink() {
     esac
   done
 
+  validate_name profile "$profile_name"
+  if [[ -n "$template_name" ]]; then
+    validate_name template "$template_name"
+  fi
+
   local profile_dir
   profile_dir="$(get_profile_dir)/$profile_name"
 

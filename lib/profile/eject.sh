@@ -2,13 +2,15 @@
 
 cmd_profile_eject() {
   local profile_name="${1:-}"
-  shift
 
   if [[ -z "$profile_name" ]]; then
     echo "Error: Profile name required" >&2
     echo "Usage: claudep profile eject <profile-name> --all | --items <item1,item2,...>" >&2
     exit 1
   fi
+  shift
+
+  validate_name profile "$profile_name"
 
   local profile_dir
   profile_dir="$(get_profile_dir)/$profile_name"
