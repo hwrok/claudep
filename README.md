@@ -148,7 +148,7 @@ For standard Claude auth there's no claudep-specific step - `claudep start <prof
 
 For Bedrock, API key, or other non-OAuth setups, eject the profile's `settings` and configure env vars there - see [Auth Configurations](#auth-configurations) below.
 
-To steer a profile's claude.ai login toward the right organization, see [Pinning a Profile to One Account](#pinning-a-profile-to-one-account).
+To steer a profile's (or plain `claude`'s) claude.ai login toward the right organization, see [Pinning a Profile to One Account](#pinning-a-profile-to-one-account).
 
 ## Installation
 
@@ -270,27 +270,42 @@ Personal profile keeps using OAuth (or whatever), work profile uses Bedrock via 
 
 ### Pinning a Profile to One Account
 
-Profiles keep logins separate, but nothing stops you from running `/login` in your `work` profile and signing in with your personal account (or vice versa). To make the right claude.ai organization the default for a profile, eject its `settings` and add:
+Profiles keep logins separate, but nothing stops you from running `/login` in your `work` profile and signing in with your personal account (or vice versa). Two settings make the right claude.ai organization the default:
 
 ```jsonc
 {
-  // in ~/.claudep/profiles/work/settings.json (after eject)
   "forceLoginMethod": "claudeai",
   "forceLoginOrgUUID": "00000000-0000-0000-0000-000000000000",
 }
 ```
 
-Grab the UUID from a profile that's already logged in to the right account:
+Where they go depends on how you start Claude.
 
-```sh
-jq -r '.oauthAccount.organizationUuid' ~/.claudep/profiles/work/.claude.json
-```
+**A claudep profile (`claudep start work`):**
+
+1. Log in to the right account once, then grab the UUID:
+   ```sh
+   jq -r '.oauthAccount.organizationUuid' ~/.claudep/profiles/work/.claude.json
+   ```
+2. `claudep profile eject work --items settings`
+3. Add both keys to `~/.claudep/profiles/work/settings.json`
+4. `claudep start work` - `/login` now pre-selects that organization
+
+**Plain `claude` alongside claudep:**
+
+Running `claude` without claudep still uses the default `~/.claude` config dir, which claudep never touches. You can pin it too, for example to keep it on your work account while personal stuff lives in a profile:
+
+1. Grab the UUID - note the file is `~/.claude.json` in your home dir, not inside `~/.claude/`:
+   ```sh
+   jq -r '.oauthAccount.organizationUuid' ~/.claude.json
+   ```
+2. Add both keys to `~/.claude/settings.json` (no eject needed - it isn't a claudep template)
 
 A few things to know:
 
-- **Eject first.** A template's `settings.json` is shared, so putting these keys there pins every profile on that template to the same organization.
-- **It's a guard rail, not a lock.** From a user-level settings file, Claude Code uses a single `forceLoginOrgUUID` to pre-select that organization at login. It only _rejects_ other organizations when the key comes from [managed settings](https://code.claude.com/docs/en/settings-reference#forceloginorguuid), and managed settings apply to the whole machine, not one profile. The interactive `/login` screen also only pre-selects the `forceLoginMethod` method rather than enforcing it.
-- **Keep these keys out of Bedrock or API-key profiles.** They're for profiles that log in with a claude.ai account.
+- **Eject first (profiles only).** A template's `settings.json` is shared, so putting these keys there pins every profile on that template to the same organization.
+- **It's a guard rail, not a lock.** From a user-level settings file, Claude Code uses a single `forceLoginOrgUUID` to pre-select that organization at login. It only _rejects_ other organizations when the key comes from [managed settings](https://code.claude.com/docs/en/settings-reference#forceloginorguuid), and managed settings apply to the whole machine - every profile and plain `claude` alike. The interactive `/login` screen also only pre-selects the `forceLoginMethod` method rather than enforcing it.
+- **Keep these keys out of Bedrock or API-key setups.** They're for config dirs that log in with a claude.ai account.
 
 ## Known Caveats
 
