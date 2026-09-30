@@ -148,6 +148,8 @@ For standard Claude auth there's no claudep-specific step - `claudep start <prof
 
 For Bedrock, API key, or other non-OAuth setups, eject the profile's `settings` and configure env vars there - see [Auth Configurations](#auth-configurations) below.
 
+To steer a profile's claude.ai login toward the right organization, see [Pinning a Profile to One Account](#pinning-a-profile-to-one-account).
+
 ## Installation
 
 **Requirements:** zsh, jq (for statusline only)
@@ -265,6 +267,30 @@ With claudep, each profile's `settings.json` scopes the env vars to that Claude 
 4. `claudep start work-bedrock` - AWS auth is scoped to this session only
 
 Personal profile keeps using OAuth (or whatever), work profile uses Bedrock via SSO, neither knows the other exists. No global env vars, no accidents, no "why is this billing to the wrong account" Slack messages at 2am. 🫡
+
+### Pinning a Profile to One Account
+
+Profiles keep logins separate, but nothing stops you from running `/login` in your `work` profile and signing in with your personal account (or vice versa). To make the right claude.ai organization the default for a profile, eject its `settings` and add:
+
+```jsonc
+{
+  // in ~/.claudep/profiles/work/settings.json (after eject)
+  "forceLoginMethod": "claudeai",
+  "forceLoginOrgUUID": "00000000-0000-0000-0000-000000000000",
+}
+```
+
+Grab the UUID from a profile that's already logged in to the right account:
+
+```sh
+jq -r '.oauthAccount.organizationUuid' ~/.claudep/profiles/work/.claude.json
+```
+
+A few things to know:
+
+- **Eject first.** A template's `settings.json` is shared, so putting these keys there pins every profile on that template to the same organization.
+- **It's a guard rail, not a lock.** From a user-level settings file, Claude Code uses a single `forceLoginOrgUUID` to pre-select that organization at login. It only _rejects_ other organizations when the key comes from [managed settings](https://code.claude.com/docs/en/settings-reference#forceloginorguuid), and managed settings apply to the whole machine, not one profile. The interactive `/login` screen also only pre-selects the `forceLoginMethod` method rather than enforcing it.
+- **Keep these keys out of Bedrock or API-key profiles.** They're for profiles that log in with a claude.ai account.
 
 ## Known Caveats
 
