@@ -148,7 +148,7 @@ For standard Claude auth there's no claudep-specific step - `claudep start <prof
 
 For Bedrock, API key, or other non-OAuth setups, eject the profile's `settings` and configure env vars there - see [Auth Configurations](#auth-configurations) below.
 
-To steer a profile's (or plain `claude`'s) claude.ai login toward the right organization, see [Pinning a Profile to One Account](#pinning-a-profile-to-one-account).
+To steer a profile's claude.ai login toward the right organization, see [Pinning a Profile to One Account](#pinning-a-profile-to-one-account).
 
 ## Installation
 
@@ -270,42 +270,25 @@ Personal profile keeps using OAuth (or whatever), work profile uses Bedrock via 
 
 ### Pinning a Profile to One Account
 
-Profiles keep logins separate, but nothing stops you from running `/login` in your `work` profile and signing in with your personal account (or vice versa). Two settings make the right claude.ai organization the default:
+To have a profile's `/login` pre-select a claude.ai organization, add these to its ejected `settings.json` (not the template - that pins every profile using it):
 
-```jsonc
+```json
 {
   "forceLoginMethod": "claudeai",
-  "forceLoginOrgUUID": "00000000-0000-0000-0000-000000000000",
+  "forceLoginOrgUUID": "<org-uuid>"
 }
 ```
 
-Where they go depends on how you start Claude.
+After logging in once, the UUID is in the profile's `.claude.json`:
 
-**A claudep profile (`claudep start work`):**
+```sh
+jq -r '.oauthAccount.organizationUuid' ~/.claudep/profiles/work/.claude.json
+```
 
-1. Log in to the right account once, then grab the UUID:
-   ```sh
-   jq -r '.oauthAccount.organizationUuid' ~/.claudep/profiles/work/.claude.json
-   ```
-2. `claudep profile eject work --items settings`
-3. Add both keys to `~/.claudep/profiles/work/settings.json`
-4. `claudep start work` - `/login` now pre-selects that organization
+(Note: plain `claude` keeps this in `~/.claude.json`, not inside `~/.claude/`.)
 
-**Plain `claude` alongside claudep:**
-
-Running `claude` without claudep still uses the default `~/.claude` config dir, which claudep never touches. You can pin it too, for example to keep it on your work account while personal stuff lives in a profile:
-
-1. Grab the UUID - note the file is `~/.claude.json` in your home dir, not inside `~/.claude/`:
-   ```sh
-   jq -r '.oauthAccount.organizationUuid' ~/.claude.json
-   ```
-2. Add both keys to `~/.claude/settings.json` (no eject needed - it isn't a claudep template)
-
-A few things to know:
-
-- **Eject first (profiles only).** A template's `settings.json` is shared, so putting these keys there pins every profile on that template to the same organization.
-- **It's a guard rail, not a lock.** From a user-level settings file, Claude Code uses a single `forceLoginOrgUUID` to pre-select that organization at login. It only _rejects_ other organizations when the key comes from [managed settings](https://code.claude.com/docs/en/settings-reference#forceloginorguuid), and managed settings apply to the whole machine - every profile and plain `claude` alike. The interactive `/login` screen also only pre-selects the `forceLoginMethod` method rather than enforcing it.
-- **Keep these keys out of Bedrock or API-key setups.** They're for config dirs that log in with a claude.ai account.
+- **Pre-select, not a lock:** from a profile's settings, `/login` still accepts any account. Claude Code only rejects other organizations when these keys come from [managed settings](https://code.claude.com/docs/en/settings-reference#forceloginorguuid), which apply to the whole machine.
+- **claude.ai profiles only:** leave these out of Bedrock, API-key, and Claude Console setups. For Console, `forceLoginOrgUUID` also turns off the keyless sign-in, so Claude Code creates an API key instead.
 
 ## Known Caveats
 
