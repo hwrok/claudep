@@ -36,7 +36,7 @@ colorize() {
 
 input=$(cat)
 
-CONTEXT_SIZE=$(echo "$input" | jq -r '.context_window.context_window_size')
+CONTEXT_SIZE=$(echo "$input" | jq -r '.context_window.context_window_size // 0')
 USAGE=$(echo "$input" | jq '.context_window.current_usage')
 DIR=$(basename "$(echo "$input" | jq -r '.cwd // empty')")
 WORKTREE=$(echo "$input" | jq -r '.workspace.git_worktree // empty')
@@ -63,7 +63,6 @@ PROFILE="${CLAUDEP_PROFILE:-unknown}"
 
 if [ "$USAGE" != "null" ]; then
   CURRENT_TOKENS=$(echo "$USAGE" | jq '.input_tokens + .cache_creation_input_tokens + .cache_read_input_tokens')
-  PERCENT_USED=$((CURRENT_TOKENS * 100 / CONTEXT_SIZE))
   TOKENS_USED_K=$((CURRENT_TOKENS / 1000))
   TOKENS_TOTAL_K=$((CONTEXT_SIZE / 1000))
   colorize --items "claudep:$PROFILE" "$MODEL" "ctx: ${TOKENS_USED_K}/${TOKENS_TOTAL_K}k" "$DIR"

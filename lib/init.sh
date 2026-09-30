@@ -46,6 +46,8 @@ cmd_init() {
   done
 
   base_path="${base_path/#\~/$HOME}"
+  # saved path is read from any cwd later, so it has to be absolute
+  base_path="${base_path:a}"
 
   local template_dir="$base_path/$DEFAULT_TEMPLATE"
   local assets_template="$SCRIPT_DIR/assets/$DEFAULT_TEMPLATE"

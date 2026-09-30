@@ -55,7 +55,7 @@ verify() {
     echo "✓ claudep is in PATH"
     claudep 2>&1 | head -n1 || true
   else
-    echo "⚠️  claudep not found in PATH. Add $target_dir to PATH or use full path: $INSTALL_TARGET"
+    echo "⚠️  claudep not found in PATH. Add $(dirname "$INSTALL_TARGET") to PATH or use full path: $INSTALL_TARGET"
   fi
 }
 
