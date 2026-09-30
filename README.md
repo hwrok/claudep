@@ -148,6 +148,8 @@ For standard Claude auth there's no claudep-specific step - `claudep start <prof
 
 For Bedrock, API key, or other non-OAuth setups, eject the profile's `settings` and configure env vars there - see [Auth Configurations](#auth-configurations) below.
 
+To steer a profile's claude.ai login toward the right organization, see [Pinning a Profile to One Account](#pinning-a-profile-to-one-account).
+
 ## Installation
 
 **Requirements:** zsh, jq (for statusline only)
@@ -265,6 +267,28 @@ With claudep, each profile's `settings.json` scopes the env vars to that Claude 
 4. `claudep start work-bedrock` - AWS auth is scoped to this session only
 
 Personal profile keeps using OAuth (or whatever), work profile uses Bedrock via SSO, neither knows the other exists. No global env vars, no accidents, no "why is this billing to the wrong account" Slack messages at 2am. 🫡
+
+### Pinning a Profile to One Account
+
+To have a profile's `/login` pre-select a claude.ai organization, add these to its ejected `settings.json` (not the template - that pins every profile using it):
+
+```json
+{
+  "forceLoginMethod": "claudeai",
+  "forceLoginOrgUUID": "<org-uuid>"
+}
+```
+
+After logging in once, the UUID is in the profile's `.claude.json`:
+
+```sh
+jq -r '.oauthAccount.organizationUuid' ~/.claudep/profiles/work/.claude.json
+```
+
+(Note: plain `claude` keeps this in `~/.claude.json`, not inside `~/.claude/`.)
+
+- **Pre-select, not a lock:** from a profile's settings, `/login` still accepts any account. Claude Code only rejects other organizations when these keys come from [managed settings](https://code.claude.com/docs/en/settings-reference#forceloginorguuid), which apply to the whole machine.
+- **claude.ai profiles only:** leave these out of Bedrock, API-key, and Claude Console setups. For Console, `forceLoginOrgUUID` also turns off the keyless sign-in, so Claude Code creates an API key instead.
 
 ## Known Caveats
 
