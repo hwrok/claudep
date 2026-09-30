@@ -12,6 +12,11 @@ cmd_template_add() {
 
   validate_name template "$template_name"
 
+  if [[ "$template_name" == -* ]]; then
+    echo "Error: Template name can't start with '-': '$template_name'" >&2
+    exit 1
+  fi
+
   local source_name="default"
 
   while [[ $# -gt 0 ]]; do

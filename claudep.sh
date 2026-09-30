@@ -12,6 +12,18 @@ LIB_DIR="$SCRIPT_DIR/lib"
 
 source "$LIB_DIR/common.sh"
 
+usage() {
+  echo "Usage: claudep {init|start|profile|template|uninstall|--version}"
+  echo ""
+  echo "Commands:"
+  echo "  init                 Initialize claudep"
+  echo "  start <profile>      Launch claude with a profile"
+  echo "  profile <command>    Manage profiles (add|remove|list|start|eject|relink)"
+  echo "  template <command>   Manage templates (add|remove|list|fill)"
+  echo "  uninstall            Remove claudep"
+  echo "  --version            Print the claudep version"
+}
+
 case "${1:-}" in
   init)
     source "$LIB_DIR/init.sh"; shift; cmd_init "$@" ;;
@@ -56,16 +68,7 @@ case "${1:-}" in
     # version comes from the clone's own tags - nothing to bump by hand
     echo "claudep $(git -C "$SCRIPT_DIR" describe --tags --always --dirty 2>/dev/null || echo unknown)" ;;
 
-  *)
-    echo "Usage: claudep {init|start|profile|template|uninstall|--version}" >&2
-    echo "" >&2
-    echo "Commands:" >&2
-    echo "  init                 Initialize claudep" >&2
-    echo "  start <profile>      Launch claude with a profile" >&2
-    echo "  profile <command>    Manage profiles (add|remove|list|start|eject|relink)" >&2
-    echo "  template <command>   Manage templates (add|remove|list|fill)" >&2
-    echo "  uninstall            Remove claudep" >&2
-    echo "  --version            Print the claudep version" >&2
-    exit 1
-    ;;
+  -h|--help) usage ;;
+
+  *) usage >&2; exit 1 ;;
 esac
