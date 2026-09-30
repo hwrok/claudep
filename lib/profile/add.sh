@@ -12,6 +12,11 @@ cmd_profile_add() {
 
   validate_name profile "$profile_name"
 
+  if [[ "$profile_name" == -* ]]; then
+    echo "Error: Profile name can't start with '-': '$profile_name'" >&2
+    exit 1
+  fi
+
   local template_name="default"
 
   while [[ $# -gt 0 ]]; do
