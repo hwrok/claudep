@@ -2,7 +2,7 @@
 
 **Profile manager for [Claude Code](https://docs.anthropic.com/en/docs/claude-code).**
 
-**[Why?](#why)** · **[Quick Start](#quick-start)** · **[How It Works](#how-it-works)** · **[Commands](#commands)** · **[Auth](#auth)** · **[Upgrading](#upgrading)** · **[Tips](#tips)** · **[Caveats](#known-caveats)**
+**[Why?](#why)** · **[Quick Start](#quick-start)** · **[How It Works](#how-it-works)** · **[Commands](#commands)** · **[Auth](#auth)** · **[Upgrading](#upgrading)** · **[Tips](#tips)** · **[Caveats](#known-caveats)** · **[Development](#development)**
 
 - **Last verified against:** Claude Code `2.1.283`
 - **Recommended minimum:** Claude Code `2.1.247` - earlier builds had sandbox bugs that could refuse or delete symlinked config
@@ -86,24 +86,24 @@ Template inheritance, minus the inheritance. One level of symlinks, no magic. �
 
 ### Top-level
 
-| Command                                 | Description                                                                                                                                            |
-| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Command                                 | Description                                                                                                                                                                                                    |
+| --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `claudep init [--path <dir>] [--force]` | Set up `~/.claudep` (or `--path`) with the default template. Re-running prompts to refresh/fill; `--force` skips the prompt and refreshes (resets the default template's shared items to the shipped version). |
-| `claudep start <profile> [...]`         | Launch Claude Code with the given profile. Extra args pass through to `claude` (e.g. `--resume`, `-p "..."`). Also aliased as `claudep profile start`. |
-| `claudep uninstall`                     | Remove the claudep symlink; optionally wipe all data.                                                                                                  |
-| `claudep --version`                     | Print the installed version, read from the clone's git tags.                                                                                           |
+| `claudep start <profile> [...]`         | Launch Claude Code with the given profile. Extra args pass through to `claude` (e.g. `--resume`, `-p "..."`). Also aliased as `claudep profile start`.                                                         |
+| `claudep uninstall`                     | Remove the claudep symlink; optionally wipe all data.                                                                                                                                                          |
+| `claudep --version`                     | Print the installed version, read from the clone's git tags.                                                                                                                                                   |
 
 ### Profiles
 
 A profile is a distinct `CLAUDE_CONFIG_DIR` - isolated auth, history, and todos. Shared config (rules, agents, CLAUDE.md, etc.) is symlinked from a template until ejected.
 
-| Command                                                | Description                                                                  |
-| ------------------------------------------------------ | ---------------------------------------------------------------------------- |
-| `claudep profile add <name> [--template <src>]`        | Create a profile symlinked to `<src>` (defaults to `default`).               |
-| `claudep profile list`                                 | List profiles with their template, plus any ejected, dangling, or missing items. |
-| `claudep profile remove <name>`                        | Delete a profile (confirmation required). Templates untouched.               |
-| `claudep profile eject <name> --all \| --items <list>` | Convert symlinked items into independent copies.                             |
-| `claudep profile relink <name> [--template <src>] \| --all` | Add missing symlinks and repair dangling ones. Ejected items are left alone. |
+| Command                                                     | Description                                                                      |
+| ----------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `claudep profile add <name> [--template <src>]`             | Create a profile symlinked to `<src>` (defaults to `default`).                   |
+| `claudep profile list`                                      | List profiles with their template, plus any ejected, dangling, or missing items. |
+| `claudep profile remove <name>`                             | Delete a profile (confirmation required). Templates untouched.                   |
+| `claudep profile eject <name> --all \| --items <list>`      | Convert symlinked items into independent copies.                                 |
+| `claudep profile relink <name> [--template <src>] \| --all` | Add missing symlinks and repair dangling ones. Ejected items are left alone.     |
 
 **Ejectable items:** `agents`, `rules`, `skills`, `commands`, `workflows`, `output-styles`, `statusline`, `keybindings` (keybindings.json), `instructions` (CLAUDE.md), `settings` (settings.json)
 
@@ -299,3 +299,14 @@ jq -r '.oauthAccount.organizationUuid' ~/.claudep/profiles/work/.claude.json
 - **JetBrains plugin / `/ide` command:** There's a [known Claude Code issue](https://github.com/anthropics/claude-code/issues/4739) where the `/ide` command and JetBrains plugin use hardcoded paths for lock files, which breaks when `CLAUDE_CONFIG_DIR` is set. This is a Claude Code bug, not a claudep bug. **Workaround:** use Claude Code from the IDE's built-in terminal (`claudep start <profile>`) rather than through the plugin. Works fine - you just don't get the plugin's UI integration.
 - **Empty template directories:** Git doesn't track empty directories, so some directories (`agents/`, `rules/`, etc) in the default template use `.gitkeep` files to persist in the repo. These are automatically removed during initialization.
 - **claude.ai skill sync is off by default:** Claude Code syncs skills enabled on a claude.ai account into `<config-dir>/skills/synced/` (on by default since 2.1.275). Under claudep that path resolves through the symlink into the _shared_ template, so one profile's hosted-account-level skills land in every profile that shares the same template. The default template ships `"syncClaudeAiSkills": false` for that reason. Turning it back on is a per-template decision rather than a global one: enable it in a template and every profile on that template pools those synced skills, which is what you want for one account across profiles for different purposes, or for two accounts you'd rather share a skill set. Anything that should stay separate goes on its own template, or ejects its `settings`. Plugins need no equivalent - `plugins` is already per-profile.
+
+## Development
+
+Tests use [bats-core](https://github.com/bats-core/bats-core). Each test runs against a throwaway `HOME` with a stub `claude`.
+
+```bash
+brew install bats-core shellcheck
+
+tests/run        # syntax, lint (shellcheck, statusline only), and tests
+tests/run bats   # tests only; extra args go to bats, e.g. tests/run bats --filter relink
+```

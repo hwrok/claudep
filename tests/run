@@ -1,0 +1,48 @@
+#!/usr/bin/env zsh
+set -euo pipefail
+
+cd "${0:A:h}/.."
+
+STATUSLINE=assets/templates/default/statusline/statusline.sh
+
+run_syntax() {
+  echo "== syntax"
+  local f
+  for f in claudep.sh install.sh uninstall.sh tests/run lib/*.sh lib/*/*.sh; do
+    zsh -n "$f"
+  done
+  bash -n "$STATUSLINE"
+  echo "ok"
+}
+
+run_lint() {
+  echo "== lint"
+  if ! command -v shellcheck >/dev/null; then
+    echo "shellcheck not installed (brew install shellcheck) - skipping"
+    return
+  fi
+  shellcheck "$STATUSLINE"
+  echo "ok"
+}
+
+run_bats() {
+  echo "== bats"
+  if ! command -v bats >/dev/null; then
+    echo "bats not installed (brew install bats-core)" >&2
+    exit 1
+  fi
+  bats "$@" tests/
+}
+
+phase="${1:-all}"
+if (( $# > 0 )); then
+  shift
+fi
+
+case "$phase" in
+  syntax) run_syntax ;;
+  lint) run_lint ;;
+  bats) run_bats "$@" ;;
+  all) run_syntax; run_lint; run_bats "$@" ;;
+  *) echo "Usage: tests/run [syntax|lint|bats|all] [bats args]" >&2; exit 1 ;;
+esac
