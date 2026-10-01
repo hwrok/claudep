@@ -32,8 +32,8 @@ cmd_profile_relink() {
 
   while [[ $# -gt 0 ]]; do
     case "$1" in
-      --template)   template_name="$2"; shift 2 ;;
-      --template=*) template_name="${1#*=}"; shift ;;
+      --template)   require_value "$@"; template_name="$2"; shift 2 ;;
+      --template=*) require_value "${1%%=*}" "${1#*=}"; template_name="${1#*=}"; shift ;;
       *)            echo "Error: Unknown flag: $1" >&2; exit 1 ;;
     esac
   done
