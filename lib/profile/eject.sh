@@ -32,8 +32,8 @@ cmd_profile_eject() {
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --all) items_to_eject=("${(@k)eject_map}"); shift ;;
-      --items) IFS=',' read -rA items_to_eject <<< "$2"; shift 2 ;;
-      --items=*) IFS=',' read -rA items_to_eject <<< "${1#*=}"; shift ;;
+      --items) require_value "$@"; IFS=',' read -rA items_to_eject <<< "$2"; shift 2 ;;
+      --items=*) require_value "${1%%=*}" "${1#*=}"; IFS=',' read -rA items_to_eject <<< "${1#*=}"; shift ;;
       *) echo "Error: Unknown flag: $1" >&2; exit 1 ;;
     esac
   done
@@ -43,7 +43,10 @@ cmd_profile_eject() {
     exit 1
   fi
 
+  local ejected=0
   for item_key in "${items_to_eject[@]}"; do
+    # tolerate "a, b"
+    item_key="${item_key//[[:space:]]/}"
     local item_path="${eject_map[$item_key]:-}"
 
     if [[ -z "$item_path" ]]; then
@@ -61,6 +64,12 @@ cmd_profile_eject() {
     # resolve symlink source before removing
     local link_target="$(readlink "$target")"
 
+    # dangling link - nothing to copy, and removing it first would lose it
+    if [[ ! -e "$link_target" ]]; then
+      echo "⚠️  $item_key: template source missing ($link_target) - restore it in the template or relink to another template (skipping)" >&2
+      continue
+    fi
+
     rm "$target"
     cp -r "$link_target" "$target"
 
@@ -70,8 +79,11 @@ cmd_profile_eject() {
     fi
 
     echo "✓ Ejected: $item_key"
+    (( ++ejected ))
   done
 
-  echo ""
-  echo "Profile '$profile_name' ejected items are now independent copies."
+  if (( ejected > 0 )); then
+    echo ""
+    echo "Profile '$profile_name' ejected items are now independent copies."
+  fi
 }

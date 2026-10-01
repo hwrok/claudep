@@ -42,11 +42,24 @@ validate_name() {
   fi
 }
 
-get_base_path() {
-  if [[ ! -f "$CONFIG_PATH_FILE" ]]; then
+# call as `require_value "$@"` from a flag's case arm: $1 is the flag, $2 its value
+require_value() {
+  if [[ $# -lt 2 || -z "$2" ]]; then
+    echo "Error: $1 requires a value" >&2
+    exit 1
+  fi
+}
+
+# get_base_path exits inside $(...) subshells, which doesn't stop the caller - so check up front
+require_init() {
+  if [[ ! -s "$CONFIG_PATH_FILE" ]]; then
     echo "Error: claudep not initialized. Run: claudep init" >&2
     exit 1
   fi
+}
+
+get_base_path() {
+  require_init
   cat "$CONFIG_PATH_FILE"
 }
 

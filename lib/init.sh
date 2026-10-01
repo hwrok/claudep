@@ -39,7 +39,7 @@ cmd_init() {
 
   while [[ $# -gt 0 ]]; do
     case "$1" in
-      --path) base_path="$2"; shift 2 ;;
+      --path) require_value "$@"; base_path="$2"; shift 2 ;;
       --force) force=true; shift ;;
       *) echo "Unknown flag: $1" >&2; exit 1 ;;
     esac
@@ -62,6 +62,7 @@ cmd_init() {
       if [[ "$existing_path" != "$base_path" ]]; then
         echo "⚠️  Already initialized at: $existing_path"
         echo "   New path requested: $base_path"
+        echo "   If you continue, profiles and templates under the old path remain on disk but are no longer managed by claudep"
       else
         echo "⚠️  Already initialized at: $base_path"
       fi
@@ -70,8 +71,8 @@ cmd_init() {
         mode="refresh"
       else
         echo ""
-        echo "  1) Refresh — overwrite default template"
-        echo "  2) Fill missing — only add files that don't exist"
+        echo "  1) Refresh — reset the default template's shared items to the shipped version (overwrites local changes)"
+        echo "  2) Fill missing — add missing top-level items only; existing items are not modified"
         echo "  3) Abort"
         echo -n "Choose [1-3]: "
         read -r choice

@@ -25,6 +25,10 @@ usage() {
 }
 
 case "${1:-}" in
+  start|profile|template) require_init ;;
+esac
+
+case "${1:-}" in
   init)
     source "$LIB_DIR/init.sh"; shift; cmd_init "$@" ;;
 
@@ -62,7 +66,7 @@ case "${1:-}" in
     ;;
 
   uninstall)
-    exec "$SCRIPT_DIR/uninstall.sh" "$@" ;;
+    shift; exec "$SCRIPT_DIR/uninstall.sh" "$@" ;;
 
   -v|--version)
     # version comes from the clone's own tags - nothing to bump by hand

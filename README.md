@@ -88,7 +88,7 @@ Template inheritance, minus the inheritance. One level of symlinks, no magic. âœ
 
 | Command                                 | Description                                                                                                                                            |
 | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `claudep init [--path <dir>] [--force]` | Set up `~/.claudep` (or `--path`) with the default template. Re-running prompts to refresh/fill; `--force` skips the prompt.                           |
+| `claudep init [--path <dir>] [--force]` | Set up `~/.claudep` (or `--path`) with the default template. Re-running prompts to refresh/fill; `--force` skips the prompt and refreshes (resets the default template's shared items to the shipped version). |
 | `claudep start <profile> [...]`         | Launch Claude Code with the given profile. Extra args pass through to `claude` (e.g. `--resume`, `-p "..."`). Also aliased as `claudep profile start`. |
 | `claudep uninstall`                     | Remove the claudep symlink; optionally wipe all data.                                                                                                  |
 | `claudep --version`                     | Print the installed version, read from the clone's git tags.                                                                                           |
