@@ -1,0 +1,63 @@
+name: validate
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: print workflow data
+        uses: hwrok/print-workflow-data@v1
+
+      - name: checkout
+        uses: actions/checkout@v7
+
+      - name: setup bats
+        id: setup
+        uses: bats-core/bats-action@4.0.0
+        with:
+          support-install: false
+          assert-install: false
+          detik-install: false
+          file-install: false
+
+      - name: syntax
+        if: always() && steps.setup.outcome == 'success'
+        run: tests/run syntax
+
+      - name: lint
+        if: always() && steps.setup.outcome == 'success'
+        run: |
+          command -v shellcheck >/dev/null || brew install shellcheck
+          tests/run lint
+
+      - name: bats
+        if: always() && steps.setup.outcome == 'success'
+        run: |
+          mkdir -p "$RUNNER_TEMP/bats"
+          tests/run bats --report-formatter junit --output "$RUNNER_TEMP/bats"
+
+      - name: report
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
+        uses: mikepenz/action-junit-report@v6.5.0
+        with:
+          report_paths: ${{ runner.temp }}/bats/*.xml
+          annotate_only: true
+          detailed_summary: true
+
+      - name: upload report
+        uses: actions/upload-artifact@v7
+        if: ${{ !cancelled() }}
+        with:
+          name: bats-report-${{ matrix.os }}
+          path: ${{ runner.temp }}/bats/
+          retention-days: 7
+          if-no-files-found: ignore

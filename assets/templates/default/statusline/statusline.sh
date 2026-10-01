@@ -26,7 +26,7 @@ colorize() {
   local output=""
   for i in "${!items[@]}"; do
     output+="\033[1;${color}m${items[$i]}\033[0m"
-    if [ $i -lt $((${#items[@]} - 1)) ]; then
+    if [ "$i" -lt $((${#items[@]} - 1)) ]; then
       output+=" | "
     fi
   done
