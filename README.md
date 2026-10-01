@@ -100,10 +100,10 @@ A profile is a distinct `CLAUDE_CONFIG_DIR` - isolated auth, history, and todos.
 | Command                                                | Description                                                                  |
 | ------------------------------------------------------ | ---------------------------------------------------------------------------- |
 | `claudep profile add <name> [--template <src>]`        | Create a profile symlinked to `<src>` (defaults to `default`).               |
-| `claudep profile list`                                 | List profiles.                                                               |
+| `claudep profile list`                                 | List profiles with their template, plus any ejected, dangling, or missing items. |
 | `claudep profile remove <name>`                        | Delete a profile (confirmation required). Templates untouched.               |
 | `claudep profile eject <name> --all \| --items <list>` | Convert symlinked items into independent copies.                             |
-| `claudep profile relink <name> [--template <src>]`     | Add missing symlinks and repair dangling ones. Ejected items are left alone. |
+| `claudep profile relink <name> [--template <src>] \| --all` | Add missing symlinks and repair dangling ones. Ejected items are left alone. |
 
 **Ejectable items:** `agents`, `rules`, `skills`, `commands`, `workflows`, `output-styles`, `statusline`, `keybindings` (keybindings.json), `instructions` (CLAUDE.md), `settings` (settings.json)
 
@@ -120,11 +120,12 @@ Claude Code grows new config directories over time, and profiles created before 
 
 ```bash
 claudep profile relink work
+claudep profile relink --all
 ```
 
 It only touches what's missing or broken - adds absent symlinks, repoints dangling ones, and leaves ejected items and links to other templates alone. Safe to re-run; a no-op if everything is already in place.
 
-The template comes from the profile's existing symlinks, and only when unambiguous. `relink` refuses and asks for an explicit `--template <src>` if the profile links to more than one template, points at a template that no longer exists, or has been fully ejected.
+The template comes from the profile's existing symlinks, and only when unambiguous. `relink` refuses and asks for an explicit `--template <src>` if the profile links to more than one template, points at a template that no longer exists, or has been fully ejected. With `--all`, those profiles are reported and skipped, and the rest are relinked.
 
 ### Templates
 
@@ -165,6 +166,8 @@ chmod +x ./install.sh
 ```
 
 The installer creates a symlink - the actual scripts stay wherever you cloned them.
+
+`claudep init` writes one config file, `$XDG_CONFIG_HOME/claudep/path` (`~/.config/claudep/path` if unset), recording the base directory for your templates and profiles.
 
 ## Upgrading
 

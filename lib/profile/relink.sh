@@ -12,18 +12,72 @@ _profile_template_dirs() {
     [[ -L "$target" ]] || continue
 
     link=$(readlink "$target")
+    # hand-made relative links resolve from the profile dir, not the cwd
+    if [[ "$link" != /* ]]; then
+      link="${${:-$profile_dir/$link}:a}"
+    fi
     seen[${link%/$item}]=1
   done
 
   print -l -- "${(@ko)seen}"
 }
 
+_relink_all() {
+  if [[ $# -gt 0 ]]; then
+    echo "Error: --all can't be combined with other flags; to use --template, relink a single profile" >&2
+    exit 1
+  fi
+
+  local -a names=()
+  local p
+  # -/ follows symlinked profile dirs
+  for p in "$(get_profile_dir)"/*(N-/); do
+    names+=("${p:t}")
+  done
+
+  if (( ${#names} == 0 )); then
+    echo "No profiles found. Create one with: claudep profile add <name>"
+    return
+  fi
+
+  # each profile runs in a subshell so one that needs --template exits without stopping the rest.
+  # errexit is off out here so we can read rc, and back on inside - a subshell in an `if` would
+  # silently run with it off
+  setopt localoptions noerrexit
+  local -a failed=()
+  local name rc
+  for name in "${names[@]}"; do
+    echo "== $name"
+    # straight to the single-profile path, so a profile literally named `--all` can't recurse
+    ( setopt errexit; _relink_profile "$name" )
+    rc=$?
+    if (( rc != 0 )); then
+      failed+=("$name")
+    fi
+    echo ""
+  done
+
+  if (( ${#failed} > 0 )); then
+    echo "Not relinked: ${failed[*]} - see errors above" >&2
+    exit 1
+  fi
+}
+
 cmd_profile_relink() {
+  if [[ "${1:-}" == --all ]]; then
+    shift
+    _relink_all "$@"
+  else
+    _relink_profile "$@"
+  fi
+}
+
+_relink_profile() {
   local profile_name="${1:-}"
 
   if [[ -z "$profile_name" ]]; then
     echo "Error: Profile name required" >&2
-    echo "Usage: claudep profile relink <profile-name> [--template <name>]" >&2
+    echo "Usage: claudep profile relink <profile-name> [--template <name>] | --all" >&2
     exit 1
   fi
   shift
@@ -112,6 +166,9 @@ cmd_profile_relink() {
 
     if [[ -L "$target" ]]; then
       current=$(readlink "$target")
+      if [[ "$current" != /* ]]; then
+        current="${${:-$profile_dir/$current}:a}"
+      fi
 
       # intact link: correct already, or deliberately pointed elsewhere
       if [[ -e "$target" ]]; then
