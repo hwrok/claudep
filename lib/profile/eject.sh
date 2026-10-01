@@ -47,6 +47,10 @@ cmd_profile_eject() {
   for item_key in "${items_to_eject[@]}"; do
     # tolerate "a, b"
     item_key="${item_key//[[:space:]]/}"
+    # trailing/doubled commas
+    if [[ -z "$item_key" ]]; then
+      continue
+    fi
     local item_path="${eject_map[$item_key]:-}"
 
     if [[ -z "$item_path" ]]; then
@@ -63,6 +67,10 @@ cmd_profile_eject() {
 
     # resolve symlink source before removing
     local link_target="$(readlink "$target")"
+    # hand-made relative links resolve from the profile dir, not the cwd
+    if [[ "$link_target" != /* ]]; then
+      link_target="${${:-$profile_dir/$link_target}:a}"
+    fi
 
     # dangling link - nothing to copy, and removing it first would lose it
     if [[ ! -e "$link_target" ]]; then

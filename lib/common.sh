@@ -1,6 +1,16 @@
 #!/usr/bin/env zsh
 
-CONFIG_DIR="$HOME/.config/claudep"
+# XDG spec: relative values are invalid and ignored
+if [[ "${XDG_CONFIG_HOME:-}" == /* ]]; then
+  CONFIG_DIR="$XDG_CONFIG_HOME/claudep"
+else
+  CONFIG_DIR="$HOME/.config/claudep"
+fi
+# pre-XDG installs always wrote ~/.config - keep reading that until it's moved
+# (keep in sync with uninstall.sh, which can't source this file under bash)
+if [[ ! -s "$CONFIG_DIR/path" && -s "$HOME/.config/claudep/path" ]]; then
+  CONFIG_DIR="$HOME/.config/claudep"
+fi
 CONFIG_PATH_FILE="$CONFIG_DIR/path"
 
 CLAUDEP_BASE_DIR_NAME=".claudep"

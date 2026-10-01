@@ -2,7 +2,16 @@
 set -euo pipefail
 
 INSTALL_TARGET="${1:-/usr/local/bin/claudep}"
-CONFIG_DIR="$HOME/.config/claudep"
+
+# same resolution as lib/common.sh, inlined so this still runs under bash
+if [[ "${XDG_CONFIG_HOME:-}" == /* ]]; then
+  CONFIG_DIR="$XDG_CONFIG_HOME/claudep"
+else
+  CONFIG_DIR="$HOME/.config/claudep"
+fi
+if [[ ! -s "$CONFIG_DIR/path" && -s "$HOME/.config/claudep/path" ]]; then
+  CONFIG_DIR="$HOME/.config/claudep"
+fi
 PROFILES_DIR_FILE="$CONFIG_DIR/path"
 
 echo "Uninstalling claudep..."
