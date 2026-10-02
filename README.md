@@ -4,7 +4,7 @@
 
 **[Why?](#why)** · **[Quick Start](#quick-start)** · **[How It Works](#how-it-works)** · **[Commands](#commands)** · **[Auth](#auth)** · **[Upgrading](#upgrading)** · **[Tips](#tips)** · **[Caveats](#known-caveats)** · **[Development](#development)**
 
-- **Last verified against:** Claude Code `2.1.283`
+- **Last verified against:** Claude Code `2.1.287`
 - **Recommended minimum:** Claude Code `2.1.247` - earlier builds had sandbox bugs that could refuse or delete symlinked config
 - **Noticed Claude Code behaving differently recently?** Check its [release notes](https://github.com/anthropics/claude-code/releases) first - upstream changes defaults fairly often
 
@@ -153,7 +153,15 @@ To steer a profile's claude.ai login toward the right organization, see [Pinning
 
 ## Installation
 
-**Requirements:** zsh, jq (for statusline only)
+**Requirements:**
+
+- zsh
+  - **macOS:** built in.
+  - **Linux:** install zsh (`sudo apt install zsh` or your distro's equivalent). It doesn't need to be your login shell.
+  - **Windows:** via WSL2 only - same as Linux, with Claude Code installed inside WSL rather than on Windows. Keep `~/.claudep` on the Linux filesystem, not under `/mnt/c`.
+- jq - for statusline support only
+  - **macOS:** built in since macOS 15 (Sequoia); on older versions, `brew install jq`.
+  - **Linux / WSL2:** `sudo apt install jq` or your distro's equivalent
 
 ```bash
 # clone/download, then:
