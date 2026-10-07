@@ -28,6 +28,8 @@ jobs:
         id: setup
         uses: bats-core/bats-action@4.0.0
         with:
+          bats-version: 1.14.0
+          github-token: ${{ github.token }}
           support-install: false
           assert-install: false
           detik-install: false
