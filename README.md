@@ -4,8 +4,8 @@
 
 **[Why?](#why)** · **[Quick Start](#quick-start)** · **[How It Works](#how-it-works)** · **[Commands](#commands)** · **[Auth](#auth)** · **[Upgrading](#upgrading)** · **[Tips](#tips)** · **[Caveats](#known-caveats)** · **[Development](#development)**
 
-- **Last verified against:** Claude Code `2.1.287`
-- **Recommended minimum:** Claude Code `2.1.247` - earlier builds had sandbox bugs that could refuse or delete symlinked config
+- **Last verified against:** [Claude Code `2.1.292`](https://github.com/anthropics/claude-code/releases/tag/v2.1.292)
+- **Recommended minimum:** [Claude Code `2.1.247`](https://github.com/anthropics/claude-code/releases/tag/v2.1.247) - earlier builds had sandbox bugs that could refuse or delete symlinked config
 - **Noticed Claude Code behaving differently recently?** Check its [release notes](https://github.com/anthropics/claude-code/releases) first - upstream changes defaults fairly often
 
 claudep is maintained even if there are not recent commits. It does one small job against a `CLAUDE_CONFIG_DIR` contract that rarely changes, so a long gap between "releases" usually means there's nothing to fix.
