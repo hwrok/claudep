@@ -15,10 +15,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: print workflow data
-        uses: hwrok/print-workflow-data@v1
+        uses: hwrok/print-workflow-data@acc0af61385ab26f5a83f809f6e2466b5d0832fd # v1.2.3
 
       - name: checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: install zsh
         if: runner.os == 'Linux'
@@ -26,7 +26,7 @@ jobs:
 
       - name: setup bats
         id: setup
-        uses: bats-core/bats-action@4.0.0
+        uses: bats-core/bats-action@77d6fb60505b4d0d1d73e48bd035b55074bbfb43 # 4.0.0
         with:
           bats-version: 1.14.0
           github-token: ${{ github.token }}
@@ -60,7 +60,7 @@ jobs:
           detailed_summary: true
 
       - name: upload report
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: ${{ !cancelled() }}
         with:
           name: bats-report-${{ matrix.os }}
