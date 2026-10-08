@@ -1,0 +1,40 @@
+name: renovate
+
+on:
+  schedule:
+    - cron: '17 6 1 * *' # 1st of the month, 06:17
+      timezone: 'America/Chicago'
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: 'dry run mode'
+        type: choice
+        options: [none, extract, lookup, full]
+        default: none
+      log-level:
+        type: choice
+        options: [info, debug]
+        default: info
+
+permissions:
+  contents: read
+
+jobs:
+  renovate:
+    concurrency:
+      group: renovate
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    steps:
+      - name: print workflow data
+        uses: hwrok/print-workflow-data@b7a0a34769eb7c0f2bfe7fcdc2683cd6572c62fd # v1.3.0
+        with:
+          caller-inputs: ${{ toJSON(inputs) }}
+
+      - name: renovate
+        uses: hwrok/action-renovate@be8f345ffc6132d6ffab346b6fd2d48e4afe369f # v1.1.0
+        with:
+          app-client-id: ${{ vars.HWROK_RENOVATE_BOT_CLIENT_ID }}
+          app-private-key: ${{ secrets.HWROK_RENOVATE_BOT_PRIVATE_KEY }}
+          dry-run: ${{ inputs.dry-run != 'none' && inputs.dry-run || '' }}
+          log-level: ${{ inputs.log-level || 'info' }}
