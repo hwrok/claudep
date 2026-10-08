@@ -22,22 +22,22 @@ jobs:
 
     steps:
       - name: print workflow data
-        uses: hwrok/print-workflow-data@v1
+        uses: hwrok/print-workflow-data@acc0af61385ab26f5a83f809f6e2466b5d0832fd # v1.2.3
 
       - name: checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
       - name: install gitversion
-        uses: gittools/actions/gitversion/setup@v4
+        uses: gittools/actions/gitversion/setup@7417b1089e2c7de93510f1901d656ddf60bb024f # v4.7.0
         with:
           versionSpec: "6.3.x"
           preferLatestVersion: true
 
       - name: compute version
         id: compute_version
-        uses: gittools/actions/gitversion/execute@v4
+        uses: gittools/actions/gitversion/execute@7417b1089e2c7de93510f1901d656ddf60bb024f # v4.7.0
         with:
           configFilePath: .github/.gitversion.yml
 
@@ -88,7 +88,7 @@ jobs:
 
       - name: create release
         if: steps.check_tag.outputs.should_tag
-        uses: softprops/action-gh-release@v3
+        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
         with:
           tag_name: ${{ steps.create_tag.outputs.tag }}
           name: "Release ${{ steps.create_tag.outputs.tag }}"
