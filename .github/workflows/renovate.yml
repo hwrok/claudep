@@ -2,12 +2,17 @@ name: renovate
 
 on:
   schedule:
-    - cron: '17 6 1 * *' # 1st of the month, 06:17
-      timezone: 'America/Chicago'
+    - cron: "17 6 1 * *" # 1st of the month, 06:17
+      timezone: "America/Chicago"
+  push:
+    branches: [main]
+    paths:
+      - .github/renovate.json
+      - .github/workflows/renovate.yml
   workflow_dispatch:
     inputs:
       dry-run:
-        description: 'dry run mode'
+        description: "dry run mode"
         type: choice
         options: [none, extract, lookup, full]
         default: none
@@ -32,7 +37,7 @@ jobs:
           caller-inputs: ${{ toJSON(inputs) }}
 
       - name: renovate
-        uses: hwrok/action-renovate@be8f345ffc6132d6ffab346b6fd2d48e4afe369f # v1.1.0
+        uses: hwrok/action-renovate@82ab7934c6bfc3b0b2add45f548427e678619755 # v1.2.0
         with:
           app-client-id: ${{ vars.HWROK_RENOVATE_BOT_CLIENT_ID }}
           app-private-key: ${{ secrets.HWROK_RENOVATE_BOT_PRIVATE_KEY }}
