@@ -62,9 +62,14 @@ claudep profile add personal
 
 # launch claude with that profile
 claudep start personal
+
+# add more profiles for other accounts - /login in each,
+# or for Bedrock/API keys, eject settings and set env (see Auth)
+claudep profile add work
+claudep start work
 ```
 
-That's it. You now have a `personal` profile that symlinks to the default template. Claude Code sees it as its config directory.
+That's it. You now have `personal` and `work` profiles that share the default template but log in and bill against separate accounts. Claude Code sees each as its own config directory.
 
 The installer creates a symlink - the actual scripts stay wherever you cloned them. `claudep init` writes one config file, `$XDG_CONFIG_HOME/claudep/path` (`~/.config/claudep/path` if unset), recording the base directory for your templates and profiles.
 
