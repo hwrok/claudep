@@ -86,7 +86,7 @@ Call out separately:
 
 - Spots where the user looks to have customized on purpose and a step would change it, e.g. a release adds `"syncClaudeAiSkills": false` but they've set it to `true`. Show both sides and recommend keep, merge, or take upstream.
 - Steps already applied or that don't apply to their setup, and why. One line each.
-- Optional steps.
+- Optional steps. These are opt-in regardless of classification: keep them out of the safe batch and ask about each one, with a recommendation based on the release's reasoning and the user's setup.
 
 Use AskUserQuestion for customization conflicts and destructive steps - one question per distinct conflict, listing every path that shares it (same step, same current value). Ask once for approval of the batch of safe steps. Don't run anything past step 4 until the user approves.
 
