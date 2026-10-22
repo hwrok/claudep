@@ -22,7 +22,7 @@ jobs:
 
     steps:
       - name: print workflow data
-        uses: hwrok/print-workflow-data@acc0af61385ab26f5a83f809f6e2466b5d0832fd # v1.2.3
+        uses: hwrok/print-workflow-data@b7a0a34769eb7c0f2bfe7fcdc2683cd6572c62fd # v1.3.0
 
       - name: checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
