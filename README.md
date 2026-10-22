@@ -95,6 +95,7 @@ If your clone predates the skill, give Claude this instead:
       commands/
       workflows/
       output-styles/
+      themes/
       statusline/
       CLAUDE.md
       settings.json
@@ -109,7 +110,7 @@ If your clone predates the skill, give Claude this instead:
 
 Template inheritance, minus the inheritance. One level of symlinks, no magic. ✨
 
-Other typical `~/.claude` directories (`cache`, `debug`, `plugins`, `todos`, `history`, etc) are auto-created by Claude Code per profile and stay isolated, so no leakage between profiles. The only things shared are the dirs claudep explicitly manages via symlinks (settings, rules, agents, skills, commands, workflows, output styles, keybindings, statusline, CLAUDE.md). `plugins` stays deliberately per-profile - plugin sources are often private or org-specific, and sharing a plugin cache across profiles invites concurrent-write races. That does mean some light redundancy per profile since caches and plugins get downloaded independently - acceptable tradeoff for now, a more pnpm-style content-addressable symlink approach may come later if it ever becomes painful enough to care about. 📦
+Other typical `~/.claude` directories (`cache`, `debug`, `plugins`, `todos`, `history`, etc) are auto-created by Claude Code per profile and stay isolated, so no leakage between profiles. The only things shared are the dirs claudep explicitly manages via symlinks (settings, rules, agents, skills, commands, workflows, output styles, themes, keybindings, statusline, CLAUDE.md). `plugins` stays deliberately per-profile - plugin sources are often private or org-specific, and sharing a plugin cache across profiles invites concurrent-write races. That does mean some light redundancy per profile since caches and plugins get downloaded independently - acceptable tradeoff for now, a more pnpm-style content-addressable symlink approach may come later if it ever becomes painful enough to care about. 📦
 
 ### Ejecting
 
@@ -154,7 +155,7 @@ A profile is a distinct `CLAUDE_CONFIG_DIR` - isolated auth, history, and todos.
 | `claudep profile eject <name> --all \| --items <list>`      | Convert symlinked items into independent copies.                                 |
 | `claudep profile relink <name> [--template <src>] \| --all` | Add missing symlinks and repair dangling ones. Ejected items are left alone.     |
 
-**Ejectable items:** `agents`, `rules`, `skills`, `commands`, `workflows`, `output-styles`, `statusline`, `keybindings` (keybindings.json), `instructions` (CLAUDE.md), `settings` (settings.json)
+**Ejectable items:** `agents`, `rules`, `skills`, `commands`, `workflows`, `output-styles`, `themes`, `statusline`, `keybindings` (keybindings.json), `instructions` (CLAUDE.md), `settings` (settings.json)
 
 ```bash
 claudep profile add work --template corp

@@ -27,6 +27,7 @@ CLAUDEP_SHARED_ITEMS=(
   "commands:commands"
   "workflows:workflows"
   "output-styles:output-styles"
+  "themes:themes"
   "statusline:statusline"
   "instructions:CLAUDE.md"
   "keybindings:keybindings.json"

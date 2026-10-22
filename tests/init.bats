@@ -3,7 +3,7 @@ load test_helper
 @test "init creates the default template with every shared item" {
   run -0 claudep init
   [[ "$(cat "$T/.config/claudep/path")" == "$T/.claudep" ]]
-  for item in agents rules skills commands workflows output-styles statusline CLAUDE.md \
+  for item in agents rules skills commands workflows output-styles themes statusline CLAUDE.md \
     keybindings.json settings.json; do
     [ -e "$TPL/default/$item" ]
   done

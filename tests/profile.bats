@@ -9,7 +9,7 @@ NAME="wörk 👨‍👩‍👧‍👦 #1 & co"
 
 @test "add, list, and start a profile with special characters in the name" {
   run -0 claudep profile add "$NAME"
-  for item in agents rules skills commands workflows output-styles statusline CLAUDE.md \
+  for item in agents rules skills commands workflows output-styles themes statusline CLAUDE.md \
     keybindings.json settings.json; do
     [ -L "$P/$NAME/$item" ]
     [[ "$(readlink "$P/$NAME/$item")" == "$TPL/default/$item" ]]
