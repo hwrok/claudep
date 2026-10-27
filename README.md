@@ -4,7 +4,7 @@
 
 **[Why?](#why)** · **[Install](#install)** · **[Upgrading](#upgrading)** · **[How It Works](#how-it-works)** · **[Commands](#commands)** · **[Auth](#auth)** · **[Statusline](#statusline)** · **[Caveats](#known-caveats)** · **[Development](#development)**
 
-- **Last verified against:** [Claude Code `2.1.296`](https://github.com/anthropics/claude-code/releases/tag/v2.1.296)
+- **Last verified against:** [Claude Code `2.1.311`](https://github.com/anthropics/claude-code/releases/tag/v2.1.311)
 - **Recommended minimum:** [Claude Code `2.1.247`](https://github.com/anthropics/claude-code/releases/tag/v2.1.247) - earlier builds had sandbox bugs that could refuse or delete symlinked config
 - **Noticed Claude Code behaving differently recently?** Check its [release notes](https://github.com/anthropics/claude-code/releases) first - upstream changes defaults fairly often
 

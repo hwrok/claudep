@@ -93,7 +93,7 @@ Use AskUserQuestion for customization conflicts and destructive steps - one ques
 ## 6. Execute
 
 1. Update the code: `git pull --ff-only <remote> main`, or `git checkout <target>` if the user asked for a specific older tag. Re-run `./install.sh` only if a release or the `install.sh` diff calls for it.
-2. Before editing any file under the base path, copy it to a fresh backup dir (`mktemp -d -t claudep-upgrade`) preserving its relative path.
+2. Before editing any file under the base path, copy it to a fresh backup dir (`mktemp -d "${TMPDIR:-/tmp}/claudep-upgrade.XXXXXX"`) preserving its relative path.
 3. Apply approved steps in plan order. Prefer claudep's own commands (`template fill`, `profile relink`) over hand-editing symlinks.
 4. Edit JSON with `jq` into a temp file, then `cat tmp > file` - `mv` would replace a symlinked path and silently eject it. Touch only the keys in question; if that empties the parent object, drop it to match the target. jq's formatting is fine.
 5. If a step fails, stop and report. Don't improvise around it.
