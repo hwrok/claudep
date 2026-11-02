@@ -37,7 +37,7 @@ jobs:
           caller-inputs: ${{ toJSON(inputs) }}
 
       - name: renovate
-        uses: hwrok/action-renovate@123a286f8d1eb473d1c0a77203b66c44cb42112a # v1.4.3
+        uses: hwrok/action-renovate@7a946034d42d0327e697c38820a4e80cbf45ded2 # v1.4.5
         with:
           app-client-id: ${{ vars.HWROK_RENOVATE_BOT_CLIENT_ID }}
           app-private-key: ${{ secrets.HWROK_RENOVATE_BOT_PRIVATE_KEY }}
