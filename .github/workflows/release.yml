@@ -30,14 +30,14 @@ jobs:
           fetch-depth: 0
 
       - name: install gitversion
-        uses: gittools/actions/gitversion/setup@7417b1089e2c7de93510f1901d656ddf60bb024f # v4.7.0
+        uses: gittools/actions/gitversion/setup@220647997b450f3e9364b6cf6a357197f17d924b # v4.7.2
         with:
           versionSpec: "6.3.x"
           preferLatestVersion: true
 
       - name: compute version
         id: compute_version
-        uses: gittools/actions/gitversion/execute@7417b1089e2c7de93510f1901d656ddf60bb024f # v4.7.0
+        uses: gittools/actions/gitversion/execute@220647997b450f3e9364b6cf6a357197f17d924b # v4.7.2
         with:
           configFilePath: .github/.gitversion.yml
 
@@ -88,7 +88,7 @@ jobs:
 
       - name: create release
         if: steps.check_tag.outputs.should_tag
-        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
+        uses: softprops/action-gh-release@8a0cd651e5b2365bd640854a3fa5dfc70e4875f3 # v3.0.4
         with:
           tag_name: ${{ steps.create_tag.outputs.tag }}
           name: "Release ${{ steps.create_tag.outputs.tag }}"
