@@ -4,7 +4,7 @@
 
 **[Why?](#why)** · **[Install](#install)** · **[Upgrading](#upgrading)** · **[How It Works](#how-it-works)** · **[Commands](#commands)** · **[Auth](#auth)** · **[Statusline](#statusline)** · **[Caveats](#known-caveats)** · **[Development](#development)**
 
-- **Last verified against:** [Claude Code `2.1.311`](https://github.com/anthropics/claude-code/releases/tag/v2.1.311)
+- **Last verified against:** [Claude Code `2.1.331`](https://github.com/anthropics/claude-code/releases/tag/v2.1.331)
 - **Recommended minimum:** [Claude Code `2.1.247`](https://github.com/anthropics/claude-code/releases/tag/v2.1.247) - earlier builds had sandbox bugs that could refuse or delete symlinked config
 - **Noticed Claude Code behaving differently recently?** Check its [release notes](https://github.com/anthropics/claude-code/releases) first - upstream changes defaults fairly often
 
@@ -33,6 +33,8 @@ There are a handful of third-party account switchers ([ccs](https://github.com/k
 claudep solves a different (though related) problem: **shared config management across profiles.** Rather than duplicating rules, agents, skills, and instructions into every profile directory, claudep symlinks them from templates. Update a template, every linked profile gets the change. Need one profile to diverge? Eject just that item and the rest keeps inheriting. None of the existing tools do this - they're account switchers, not config managers.
 
 That said, claudep _is_ also an account switcher, ie each profile has its own isolated auth state, so switching profiles switches accounts. It just gets there as a side effect of managing entire config directories rather than swapping credentials directly. 🤝
+
+As of 2.1.234, Claude Code also has "Anthropic profiles" (Console sign-ins via `ant auth login`) - an unrelated auth feature, not claudep profiles.
 
 ## Install
 
@@ -264,6 +266,8 @@ This is configured automatically via the template's `settings.json`, and needs `
 ## Known Caveats
 
 - **Nonessential traffic is off by default:** the default template's `env` block sets `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1` and `DISABLE_TELEMETRY=1`. Either one alone also turns off Claude Code's feature-flag fetching, which gates a number of features. That set grows and changes release to release, so it isn't enumerated here - Anthropic maintains it under [features that need feature-flag fetching](https://code.claude.com/docs/en/env-vars#features-that-need-feature-flag-fetching). If you want any of it, drop both entries from your template's `env`.
+- **Sandbox write grants need the real template path:** the Bash sandbox silently ignores `sandbox.filesystem.allowWrite` entries that go through a symlink, so grant `~/.claudep/templates/<name>/rules`, not `<profile>/rules`.
+- **Remote Control logs ignore `CLAUDE_CONFIG_DIR`:** `claude remote-control --verbose` writes to `~/.claude/child-logs/`, shared across all profiles.
 - **JetBrains plugin / `/ide` command:** There's a [known Claude Code issue](https://github.com/anthropics/claude-code/issues/4739) where the `/ide` command and JetBrains plugin use hardcoded paths for lock files, which breaks when `CLAUDE_CONFIG_DIR` is set. This is a Claude Code bug, not a claudep bug. **Workaround:** use Claude Code from the IDE's built-in terminal (`claudep start <profile>`) rather than through the plugin. Works fine - you just don't get the plugin's UI integration.
 - **claude.ai skill sync is off by default:** Claude Code syncs skills enabled on a claude.ai account into `<config-dir>/skills/synced/` (on by default since 2.1.275). Under claudep that path resolves through the symlink into the _shared_ template, so one profile's hosted-account-level skills land in every profile that shares the same template. The default template ships `"syncClaudeAiSkills": false` for that reason. Turning it back on is a per-template decision rather than a global one: enable it in a template and every profile on that template pools those synced skills, which is what you want for one account across profiles for different purposes, or for two accounts you'd rather share a skill set. Anything that should stay separate goes on its own template, or ejects its `settings`. Plugins need no equivalent - `plugins` is already per-profile.
 
